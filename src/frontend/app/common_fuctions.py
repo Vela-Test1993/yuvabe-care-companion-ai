@@ -13,7 +13,9 @@ def img_to_base64(image_path):
         logger.error(f"Error converting image to base64: {str(e)}")
         return None
     
-API_URL = "http://127.0.0.1:8000"
+# API_URL = "http://127.0.0.1:8000"
+API_URL ="https://velatest-yuvabe-care-companion-ai.hf.space"
+
 
 def get_api_response(endpoint:str, prompt: str):
     try:

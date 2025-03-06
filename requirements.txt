@@ -1,0 +1,12 @@
+streamlit
+requests
+Pillow
+pandas
+fastapi[standard]
+pinecone
+torch
+torchvision
+torchaudio
+sentence_transformers
+groq
+chromadb

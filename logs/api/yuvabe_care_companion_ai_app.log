@@ -1,0 +1,77 @@
+2025-03-06 21:45 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:45 - ERROR - Error converting image to base64: [Errno 2] No such file or directory: 'src/data/images/page_icon.jpg'
+2025-03-06 21:45 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:45 - INFO - user_name is None, requesting user input.
+2025-03-06 21:46 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:46 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:46 - INFO - user_name is None, requesting user input.
+2025-03-06 21:47 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:47 - INFO - user_name is None, requesting user input.
+2025-03-06 21:47 - INFO - User entered name: Vela. Setting session_state.user_name.
+2025-03-06 21:47 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:47 - INFO - User already entered a name: Vela. Displaying greeting.
+2025-03-06 21:47 - INFO - Displaying the chat history.
+2025-03-06 21:47 - INFO - Waiting for user input...
+2025-03-06 21:47 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:47 - INFO - User already entered a name: Vela. Displaying greeting.
+2025-03-06 21:47 - INFO - Displaying the chat history.
+2025-03-06 21:47 - INFO - Waiting for user input...
+2025-03-06 21:47 - INFO - Assistant response: Sorry to hear that you're not feeling well today. It's always a good idea to try to identify the pos...
+2025-03-06 21:48 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:48 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:48 - INFO - user_name is None, requesting user input.
+2025-03-06 21:51 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:51 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:51 - INFO - user_name is None, requesting user input.
+2025-03-06 21:51 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:51 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:51 - INFO - user_name is None, requesting user input.
+2025-03-06 21:51 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:51 - INFO - user_name is None, requesting user input.
+2025-03-06 21:51 - INFO - User entered name: Velu. Setting session_state.user_name.
+2025-03-06 21:51 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:51 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:51 - INFO - Displaying the chat history.
+2025-03-06 21:51 - INFO - Waiting for user input...
+2025-03-06 21:52 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:52 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:52 - INFO - Displaying the chat history.
+2025-03-06 21:52 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:53 - INFO - user_name is None, requesting user input.
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - user_name is None, requesting user input.
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - user_name is None, requesting user input.
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - user_name is None, requesting user input.
+2025-03-06 21:53 - INFO - User entered name: Velu. Setting session_state.user_name.
+2025-03-06 21:53 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:53 - INFO - User already entered a name: Velu. Displaying greeting.
+2025-03-06 21:53 - INFO - Displaying the chat history.
+2025-03-06 21:53 - INFO - Waiting for user input...
+2025-03-06 21:55 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:55 - INFO - Page successfully configured with title: Yuvabe Care Companion AI
+2025-03-06 21:55 - INFO - user_name not found in session_state, setting to None.
+2025-03-06 21:55 - INFO - user_name is None, requesting user input.

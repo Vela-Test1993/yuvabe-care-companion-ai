@@ -2,4 +2,4 @@
 .env
 vector-db
 src/backend/data/dataset.csv
-dataset.csv
+src/backend/data/dataset.csv

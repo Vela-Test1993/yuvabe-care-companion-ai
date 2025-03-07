@@ -22,7 +22,7 @@ SYSTEM_PROMPT = """You are Yuvabe Care Companion AI, an advanced healthcare assi
 
 def get_medical_assistant_response(prompt: list):
     try:
-        if not prompt or len(prompt[0]) < 5:
+        if not prompt or len(prompt[0]['context']) < 5:
             return "⚠️ Your question seems too short. Please provide more details so I can assist you better."
         querry = prompt[-1]
         response = chroma_db.search_vector_store(querry)
@@ -62,38 +62,38 @@ def get_medical_assistant_response(prompt: list):
         logger.exception("Unexpected error occurred.")
         return f"An error occurred while processing your request: {str(e)}"
 
-# def get_medical_assistant_response(conversation_history: list):
-#     try:
-#         if not conversation_history or len(conversation_history) < 1:
-#             return "⚠️ Please provide more details so I can assist you better."
-#         latest_user_message = conversation_history[-1]["content"]
-#         retrieved_contexts = []
-#         chroma_response = chroma_db.search_vector_store(latest_user_message)
-#         if chroma_response and "metadatas" in chroma_response and chroma_response["metadatas"]:
-#             retrieved_contexts = [metadata['answer'] for metadata in chroma_response["metadatas"][0]]
-#         context = "\n".join(retrieved_contexts[:3]) if retrieved_contexts else "No relevant information found in the database."
-#         rag_prompt = f"""
-#         You are a helpful medical assistant. Use the provided context to answer the question accurately.
-#         If the context is not relevant, rely on your knowledge to answer.
+def get_medical_assistant_request(conversation_history: list):
+    try:
+        if not conversation_history or len(conversation_history) < 1:
+            return "⚠️ Please provide more details so I can assist you better."
+        latest_user_message = conversation_history[-1]["content"]
+        retrieved_contexts = []
+        chroma_response = chroma_db.search_vector_store(latest_user_message)
+        if chroma_response and "metadatas" in chroma_response and chroma_response["metadatas"]:
+            retrieved_contexts = [metadata['answer'] for metadata in chroma_response["metadatas"][0]]
+        context = "\n".join(retrieved_contexts[:3]) if retrieved_contexts else "No relevant information found in the database."
+        rag_prompt = f"""
+        You are a helpful medical assistant. Use the provided context to answer the question accurately.
+        If the context is not relevant, rely on your knowledge to answer.
 
-#         **Context:** 
-#         {context}
+        **Context:** 
+        {context}
 
-#         **User Question:** {latest_user_message}
-#         """
-#         messages = [{"role": "system", "content": SYSTEM_PROMPT}] + conversation_history
-#         messages.append({"role": "user", "content": rag_prompt})
+        **User Question:** {latest_user_message}
+        """
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}] + conversation_history
+        messages.append({"role": "user", "content": rag_prompt})
 
-#         chat_completion = client.chat.completions.create(
-#             messages=messages,
-#             model=LLM_MODEL_NAME,
-#         )
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model=LLM_MODEL_NAME,
+        )
 
-#         assistant_response = chat_completion.choices[0].message.content
-#         logger.info(f"Generated AI response for user prompt: {latest_user_message[:50]}...")
+        assistant_response = chat_completion.choices[0].message.content
+        logger.info(f"Generated AI response for user prompt: {latest_user_message[:50]}...")
 
-#         return assistant_response
-#     except Exception as e:
-#         logger.exception("Unexpected error occurred while generating response.")
-#         return f"An error occurred while processing your request: {str(e)}"
+        return assistant_response
+    except Exception as e:
+        logger.exception("Unexpected error occurred while generating response.")
+        return f"An error occurred while processing your request: {str(e)}"
 

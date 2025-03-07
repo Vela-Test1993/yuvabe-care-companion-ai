@@ -6,4 +6,4 @@ class Chat_Response(BaseModel):
     response: Optional[Dict] = None
 
 class ChatRequest(BaseModel):
-    conversation_history: List
+    conversation_history: List[Dict]

@@ -1,7 +1,10 @@
+import os
 import base64
 import requests
+from dotenv import load_dotenv
 from utils import logger
 
+load_dotenv()
 logger = logger.get_logger()
 
 def img_to_base64(image_path):
@@ -13,9 +16,7 @@ def img_to_base64(image_path):
         logger.error(f"Error converting image to base64: {str(e)}")
         return None
     
-# API_URL = "http://127.0.0.1:8000"
-API_URL ="https://velatest-yuvabe-care-companion-ai.hf.space"
-
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 def get_api_response(endpoint:str, prompt: str):
     try:

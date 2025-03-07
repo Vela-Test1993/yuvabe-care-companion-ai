@@ -7,8 +7,8 @@ from data import chroma_db
 logger = logger.get_logger()
 router = APIRouter()
 
-@router.post("/response")
-async def get_chat_response(chat_request: Chat_Response):
+@router.post("/agent_response")
+async def get_assistant_response(chat_request: Chat_Response):
     try:
         logger.info(f"Received user prompt: {chat_request.prompt}")
         response_text  = llm_model.get_medical_assistant_response(chat_request.prompt)
@@ -18,8 +18,8 @@ async def get_chat_response(chat_request: Chat_Response):
         logger.exception("Unexpected error occurred while processing the request.")
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
     
-@router.post("/dbresponse")
-async def get_chat_response_db(chat_request: Chat_Response):
+@router.post("/db_response")
+async def get_db_response(chat_request: Chat_Response):
     try:
         response_text  = chroma_db.search_vector_store(chat_request.prompt)
         return {"status": "success", "response": response_text}

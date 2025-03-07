@@ -7,7 +7,8 @@ st.title("Database Response")
 st.write("This page is used to get the response from the database")
 prompt = st.text_input("Enter your prompt")
 if st.button("Get DB response"):
-    response = common_fuctions.get_api_response("/chat/dbresponse",prompt)
+    endpoint = "/chat/db_response"
+    response = common_fuctions.get_api_response(endpoint, prompt)
     for metadata_group in response["metadatas"]:
         for entry in metadata_group:
             st.write("Question:", entry["question"])

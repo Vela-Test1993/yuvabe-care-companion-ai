@@ -177,3 +177,21 @@ Trying to import the above resulted in these errors:
 2025-03-06 23:08 - INFO - Successfully fetched the data from database
 2025-03-06 23:11 - INFO - Trying to fetch the data from database
 2025-03-06 23:11 - INFO - Successfully fetched the data from database
+2025-03-07 06:48 - INFO - Trying to fetch the data from database
+2025-03-07 06:48 - INFO - Successfully fetched the data from database
+2025-03-07 06:49 - INFO - Received user prompt: I'm not feeling well today
+2025-03-07 06:49 - INFO - Trying to fetch the data from database
+2025-03-07 06:49 - INFO - Successfully fetched the data from database
+2025-03-07 06:49 - INFO - Generated AI response for user prompt: I'm not feeling well today...
+2025-03-07 06:49 - INFO - Generated AI response: I'm so sorry to hear that you're not feeling well today. Can you please tell me more about your symp...
+2025-03-07 06:54 - INFO - Received user prompt: I'm not feeling well today
+2025-03-07 06:54 - INFO - Trying to fetch the data from database
+2025-03-07 06:54 - INFO - Successfully fetched the data from database
+2025-03-07 06:54 - INFO - Generated AI response for user prompt: I'm not feeling well today...
+2025-03-07 06:54 - INFO - Generated AI response: I'm so sorry to hear that you're not feeling well today. It can be really frustrating and concerning...
+2025-03-07 06:55 - INFO - Trying to fetch the data from database
+2025-03-07 06:55 - INFO - Successfully fetched the data from database
+2025-03-07 07:06 - INFO - Trying to fetch the data from database
+2025-03-07 07:06 - INFO - Successfully fetched the data from database
+2025-03-07 07:15 - INFO - Trying to fetch the data from database
+2025-03-07 07:15 - INFO - Successfully fetched the data from database

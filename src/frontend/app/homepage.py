@@ -38,26 +38,20 @@ def display_chat():
         logger.info(f"Displayed {len(st.session_state.messages)} messages from the chat history.")
 
 def handle_user_input():
-    """
-    Handles user input for Yuvabe Care Companion AI, validates query relevance,
-    and fetches a response from the medical assistant model.
-    """
 
     logger.info("Waiting for user input...")
-
     prompt = st.chat_input("Ask me anything about health, physiotherapy, or medical advice!")
-
     if prompt:
 
         with st.chat_message("user"):
             st.markdown(prompt)
-
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         try:
             with st.spinner("Processing your query..."):
                 try:
-                    response = common_fuctions.get_api_response("/chat/response", prompt)
+                    endpoint = "/chat/agent_response"
+                    response = common_fuctions.get_api_response(endpoint, prompt)
                 except Exception as e:
                     logger.error(f"AI response generation failed: {str(e)}")
                     response = "⚠️ Sorry, I couldn't process your request. Please try again later."

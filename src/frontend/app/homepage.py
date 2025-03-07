@@ -66,6 +66,41 @@ def handle_user_input():
 
         logger.info(f"Assistant response: {response[:100]}...")
 
+# def handle_user_input():
+
+#     logger.info("Waiting for user input...")
+#     prompt = st.chat_input("Ask me anything about health, physiotherapy, or medical advice!")
+#     if prompt:
+
+#         with st.chat_message("user"):
+#             st.markdown(prompt)
+#         st.session_state.messages.append({"role": "user", "content": prompt})
+#         if 'conversation_history' not in st.session_state:
+#             st.session_state.conversation_history = common_fuctions.initialize_conversation()
+
+#         try:
+#             with st.spinner("Processing your query..."):
+#                 try:
+#                     endpoint = "/chat/agent_response"
+#                     response = common_fuctions.get_api_response(endpoint, [prompt])
+#                     # st.session_state.conversation_history.append({"role": "user", "content": prompt})
+#                     # endpoint = "chat/chat"
+#                     # response = common_fuctions.send_chat_to_backend(endpoint, st.session_state.conversation_history)
+#                     # st.session_state.conversation_history.append({"role": "assistant", "content": response})
+#                 except Exception as e:
+#                     logger.error(f"AI response generation failed: {str(e)}")
+#                     response = "⚠️ Sorry, I couldn't process your request. Please try again later."
+#         except Exception as e:
+#             logger.exception("Error during similarity check or response generation.")
+#             response = "⚠️ Oops! Something went wrong. Please try again."
+
+#         with st.chat_message("assistant"):
+#             st.markdown(response)
+
+#         st.session_state.messages.append({"role": "assistant", "content": response})
+
+#         logger.info(f"Assistant response: {response[:100]}...")
+
 def config_homepage():
     st.set_page_config(
     page_title=PAGE_TITLE,

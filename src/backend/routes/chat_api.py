@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from utils import logger
-from models.schemas import Chat_Response
+from models.schemas import Chat_Response, ChatRequest
 from models import llm_model
 from data import chroma_db
 
@@ -29,3 +29,11 @@ async def get_db_response(chat_request: Chat_Response):
     except Exception as e:
         logger.exception("Unexpected error occurred while processing the request.")
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
+
+# @router.post("/chat")
+# async def chat_with_assistant(request: ChatRequest):
+#     try:
+#         response = llm_model.get_medical_assistant_response(request.conversation_history)
+#         return {"response": response}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))

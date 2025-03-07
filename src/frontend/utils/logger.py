@@ -3,7 +3,7 @@ from logging.handlers import RotatingFileHandler
 import os
 
 log_file = 'yuvabe_care_companion_ai_app.log'
-log_dir = 'logs/api'
+log_dir = 'logs/app'
 log_level=logging.INFO
 
 def get_logger( ):

@@ -1,0 +1,6 @@
+.venv
+.env
+vector-db
+src/backend/data/dataset.csv
+project_requirement
+logs

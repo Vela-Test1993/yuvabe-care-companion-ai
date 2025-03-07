@@ -19,7 +19,7 @@ def img_to_base64(image_path):
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 
-def get_api_response(endpoint:str, prompt: str):
+def get_api_response(endpoint:str, prompt: list):
     try:
         response = requests.post(f"{API_URL}/{endpoint}", json={"prompt": prompt})
         if response.status_code == 200:

@@ -7,10 +7,10 @@ logger = logger.get_logger()
 
 # Constants
 COLLECTION_NAME = "care_companion_ai_vectors"
-DB_PATH = "vector-db"
+DB_PATH = "./src/backend/vector-db"
 
 # Initialize ChromaDB Client
-client = chromadb.PersistentClient(path="src/backend/vector-db")
+client = chromadb.PersistentClient(path=DB_PATH)
 
 collection = client.get_or_create_collection(
     name=COLLECTION_NAME,

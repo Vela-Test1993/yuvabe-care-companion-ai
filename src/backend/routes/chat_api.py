@@ -21,7 +21,10 @@ async def get_assistant_response(chat_request: Chat_Response):
 @router.post("/db_response")
 async def get_db_response(chat_request: Chat_Response):
     try:
-        response_text  = chroma_db.search_vector_store(chat_request.prompt)
+        logger.info(f"Received user prompt: {chat_request.prompt}")
+        query = chat_request.prompt[-1]
+        response_text  = chroma_db.search_vector_store(query)
+        logger.info(f"Retrieved context for user prompt: {chat_request.prompt[:50]}...")
         return {"status": "success", "response": response_text}
     except Exception as e:
         logger.exception("Unexpected error occurred while processing the request.")

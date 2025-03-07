@@ -51,7 +51,7 @@ def handle_user_input():
             with st.spinner("Processing your query..."):
                 try:
                     endpoint = "/chat/agent_response"
-                    response = common_fuctions.get_api_response(endpoint, prompt)
+                    response = common_fuctions.get_api_response(endpoint, [prompt])
                 except Exception as e:
                     logger.error(f"AI response generation failed: {str(e)}")
                     response = "⚠️ Sorry, I couldn't process your request. Please try again later."

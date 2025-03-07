@@ -79,7 +79,7 @@ pip install -r requirements.txt
 To run yuvabe_care_companion_ai, execute the following command:
 
 ```bash
-streamlit run yuvabe_care_companion_ai.py
+streamlit run src/frontend/home.py
 ```
 
 This will start the Streamlit server, and you should see output indicating the local URL where the app is being served, typically `http://localhost:8501`.

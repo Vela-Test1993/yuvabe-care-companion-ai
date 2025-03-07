@@ -22,12 +22,12 @@ SYSTEM_PROMPT = """You are Yuvabe Care Companion AI, an advanced healthcare assi
 ⚠️ *Important*: You are not a certified doctor. Always remind users to consult a healthcare professional for medical decisions.
 """
 
-def get_medical_assistant_response(prompt: str):
+def get_medical_assistant_response(prompt: list):
     try:
-        if not prompt or len(prompt.strip()) < 5:
+        if not prompt or len(prompt[0]) < 5:
             return "⚠️ Your question seems too short. Please provide more details so I can assist you better."
-
-        response = chroma_db.search_vector_store(prompt)
+        querry = prompt[-1]
+        response = chroma_db.search_vector_store(querry)
         
         if response and "metadatas" in response and response["metadatas"]:
             retrieved_contexts = [metadata['answer'] for metadata in response["metadatas"][0]]
@@ -35,7 +35,7 @@ def get_medical_assistant_response(prompt: str):
         else:
             context = "No relevant information found in the database."
 
-        system_prompt = f"""
+        rag_prompt = f"""
         You are a helpful medical assistant. Use the provided context to answer the question as accurately as possible.
         If the context is not relevant, rely on your knowledge to answer.
         
@@ -44,11 +44,13 @@ def get_medical_assistant_response(prompt: str):
         
         User Question: {prompt}
         """
+        # messages.insert(0, {"role": "system", "content": SYSTEM_PROMPT})
+        # messages[-1]["content"] = rag_prompt
 
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": system_prompt},
+                {"role": "user", "content": rag_prompt},
             ],
             model=LLM_MODEL_NAME,
         )

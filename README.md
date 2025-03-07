@@ -7,8 +7,6 @@ sdk: docker
 pinned: false
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
-
 <h1><span style="color: crimson;">Yuvabe Care Companion AI</span> - Health Assistant <img src="src\frontend\images\page_icon.jpg" alt="Streamlit logo" width="50" style="border-radius: 25px;"/></h1>
 
 <p align="center">

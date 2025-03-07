@@ -86,32 +86,12 @@ def config_homepage():
 
     logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
     st.session_state.config_status = False
-
-def setup_homepage():
-    st.set_page_config(
-        page_title=PAGE_TITLE,
-        page_icon= PAGE_ICON,
-        layout=PAGE_LAYOUT,
-        initial_sidebar_state="auto",
-        menu_items={"Get help":GITHUB_LINK,
-                    "Report a bug": GITHUB_LINK,
-                    "About": ABOUT_US}
-    )
-
-    st.markdown(f"""
-        <h1 style="color: darkblue; text-align: left; font-size: 50px;">
-        <i>{PAGE_TITLE} 🏥⚕️🤖</i>
-        </h1>
-        """, unsafe_allow_html=True
-    )
-
-    logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
-    st.session_state.config_status = False
-
     st.markdown("<hr>", unsafe_allow_html=True)  # To add a Horizontal line below title
 
-    img_base64 = common_fuctions.img_to_base64(PAGE_ICON)
+def setup_homepage():
 
+    config_homepage()
+    img_base64 = common_fuctions.img_to_base64(PAGE_ICON)
     if img_base64:
         st.sidebar.markdown(
             f'<img src="data:image/png;base64,{img_base64}" class="cover-glow">',

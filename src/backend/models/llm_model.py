@@ -22,10 +22,10 @@ SYSTEM_PROMPT = """You are Yuvabe Care Companion AI, an advanced healthcare assi
 
 def get_medical_assistant_response(prompt: list):
     try:
-        if not prompt or len(prompt[0]['context']) < 5:
+        if not prompt or len(prompt[0]) < 5:
             return "⚠️ Your question seems too short. Please provide more details so I can assist you better."
-        querry = prompt[-1]
-        response = chroma_db.search_vector_store(querry)
+        query = prompt[-1]
+        response = chroma_db.search_vector_store(query)
         
         if response and "metadatas" in response and response["metadatas"]:
             retrieved_contexts = [metadata['answer'] for metadata in response["metadatas"][0]]

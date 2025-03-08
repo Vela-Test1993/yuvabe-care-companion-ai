@@ -33,7 +33,8 @@ async def get_db_response(chat_request: Chat_Response):
 @router.post("/chat")
 async def chat_with_assistant(request: ChatRequest):
     try:
-        response = llm_model.get_medical_assistant_response(request.conversation_history)
+        logger.info(f"Received user prompt: {request.conversation_history}")
+        response = llm_model.get_medical_assistant_request(request.conversation_history)
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

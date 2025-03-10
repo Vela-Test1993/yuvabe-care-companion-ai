@@ -1,4 +1,5 @@
 import chromadb
+import asyncio
 from utils import logger
 from chromadb.utils import embedding_functions
 default_ef = embedding_functions.DefaultEmbeddingFunction()
@@ -11,6 +12,11 @@ DB_PATH = "./src/backend/vector-db"
 
 # Initialize ChromaDB Client
 client = chromadb.PersistentClient(path=DB_PATH)
+
+
+
+# chroma_client = chromadb.HttpClient(host='localhost', port=8000)
+# client = chromadb.AsyncHttpClient()
 
 collection = client.get_or_create_collection(
     name=COLLECTION_NAME,

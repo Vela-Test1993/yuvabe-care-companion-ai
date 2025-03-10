@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from utils import logger
 from models.schemas import Chat_Response, ChatRequest
 from models import llm_model
-from data import chroma_db
+from data import pinecone_db
+# from data import chroma_db
 
 logger = logger.get_logger()
 router = APIRouter()
@@ -23,9 +24,9 @@ async def get_db_response(chat_request: Chat_Response):
     try:
         logger.info(f"Received user prompt: {chat_request.prompt}")
         query = chat_request.prompt[-1]
-        response_text  = chroma_db.search_vector_store(query)
+        response_text  = pinecone_db.search_vector_store(query)
         logger.info(f"Retrieved context for user prompt: {chat_request.prompt[:50]}...")
-        return {"status": "success", "response": response_text}
+        return response_text
     except Exception as e:
         logger.exception("Unexpected error occurred while processing the request.")
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
@@ -38,3 +39,5 @@ async def chat_with_assistant(request: ChatRequest):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# Input format for above endpoint

@@ -32,4 +32,4 @@ RUN chmod +x /usr/local/bin/wait-for-it
 EXPOSE 8000 7860
 
 # Combined startup with better control
-CMD ["sh", "-c", "tmux new-session -d -s backend 'uvicorn src.backend.main:app --host 0.0.0.0 --port 8000' && echo 'Waiting for FastAPI to start...' && sleep 10 && streamlit run src/frontend/home.py --server.port 7860 --server.address 0.0.0.0"]
+CMD ["sh", "-c", "fastapi dev src/backend/main.py --host 0.0.0.0 --port 8000 & sleep 5 && streamlit run src/frontend/home.py --server.port 7860 --server.address 0.0.0.0"]

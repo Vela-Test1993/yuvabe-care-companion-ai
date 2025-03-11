@@ -45,7 +45,7 @@ def upsert_data_request(start, end):
     try:
         url = "http://localhost:8000/data/upsert_data"
         response = requests.post(url, data=json.dumps(payload), headers=headers)
-        return response
+        return response.json()
     except requests.exceptions.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
     except Exception as err:

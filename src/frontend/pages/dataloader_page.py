@@ -27,14 +27,10 @@ def load_data():
 
             with st.spinner("⏳ Upserting data... Please wait"):
                 response = common_fuctions.upsert_data_request(start_index, end_index)
-                st.write(response)
-                # if response.get("status") == "success":
-                #     st.success("Data upserted successfully!")
-                #     st.session_state.load_clicked = False
-                # else:
-                #     st.error("Failed to upsert data.")
-                #     logger.error("Failed to upsert data.")
-                #     st.session_state.load_clicked = False
+                if response.get("status") == "success": 
+                    st.success("Data upserted successfully!")
+                else:
+                    st.error("Error upserting data.")
     except Exception as e:
         st.error(f"Error loading data: {e}")
         logger.error(f"Error loading data: {e}")

@@ -2,6 +2,7 @@ import os
 from groq import Groq
 from utils import logger
 from data import chroma_db
+from data import pinecone_db
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +26,7 @@ def get_medical_assistant_response(prompt: list):
         if not prompt or len(prompt[0]) < 5:
             return "⚠️ Your question seems too short. Please provide more details so I can assist you better."
         query = prompt[-1]
-        response = chroma_db.search_vector_store(query)
+        response = pinecone_db.search_vector_store(query)
         
         if response and "metadatas" in response and response["metadatas"]:
             retrieved_contexts = [metadata['answer'] for metadata in response["metadatas"][0]]
@@ -68,7 +69,7 @@ def get_medical_assistant_request(conversation_history: list):
             return "⚠️ Please provide more details so I can assist you better."
         latest_user_message = conversation_history[-1]["content"]
         retrieved_contexts = []
-        chroma_response = chroma_db.search_vector_store(latest_user_message)
+        chroma_response = pinecone_db.search_vector_store(latest_user_message)
         if chroma_response and "metadatas" in chroma_response and chroma_response["metadatas"]:
             retrieved_contexts = [metadata['answer'] for metadata in chroma_response["metadatas"][0]]
         context = "\n".join(retrieved_contexts[:3]) if retrieved_contexts else "No relevant information found in the database."

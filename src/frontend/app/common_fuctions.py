@@ -3,6 +3,7 @@ import base64
 import requests
 from dotenv import load_dotenv
 from utils import logger
+import json
 
 load_dotenv()
 logger = logger.get_logger()
@@ -27,11 +28,28 @@ def get_api_response(endpoint:str, prompt: list):
         logger.info(f"Sending user prompt to API endpoint: {API_URL}{endpoint}")
         response = requests.post(f"{API_URL}{endpoint}", json={"prompt": prompt})
         if response.status_code == 200:
-            return response.json()["response"]
+            return response.json()
         else:
             return "An error occurred while processing your request."
     except Exception as e:
         return f"An error occurred while processing your request: {str(e)}"
+    
+
+def upsert_data_request(start, end):
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "start": start,
+        "end": end
+    }
+
+    try:
+        url = "http://localhost:8000/data/upsert_data"
+        response = requests.post(url, data=json.dumps(payload), headers=headers)
+        return response
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
     
 def initialize_conversation():
 

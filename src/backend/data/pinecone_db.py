@@ -61,37 +61,6 @@ def get_index():
 
 index = get_index()
 
-def process_and_upsert_data(index, data: pd.DataFrame):
-
-    # Validate if the required columns exist in the row (Series)
-    try:
-        logger.info("Started upserting the data to database")
-        for idx, row in data.iterrows():
-            logger.info(f"Processing row {row['input']}")
-            input_text = row['input']
-            output_text = row['output']
-            instruction_text = row['instruction']
-            if not isinstance(input_text, str) or not input_text.strip():
-                logger.warning(f"Skipping row {idx} due to empty or invalid input text.")
-                continue
-            row_dict = {
-                "question": input_text,
-                "answer" : output_text,
-                "instruction": instruction_text
-            }
-            embeddings = embedding_model.get_text_embedding(row['input'])
-            index.upsert(
-            vectors=[{
-                "id": f"id{idx}",
-                "values": embeddings,
-                "metadata":row_dict
-            }],
-            namespace=NAMESPACE,
-        )
-        logger.info(f"Successfully upserted data for question {input_text} with answer {output_text}")
-    except Exception as e:
-        logger.error(f"Error processing row with index {idx}: {e}")
-
 def search_vector_store(query, n_result : int = 3) -> list[dict]:
     """
     Searches the vector store for the most relevant matches based on the given query.
@@ -138,27 +107,51 @@ def get_retrieved_context(prompt: str) -> str:
         return "\n".join(retrieved_contexts[:3])
     return "No relevant information found in the database."
 
-df = dataset.get_data_set()[6:200]
-# process_and_upsert_data(index, data_set)
+def upsert_data_in_db(df: pd.DataFrame):
+
+    """
+    Generates embeddings for the given DataFrame and uploads data to Pinecone in batches.
+    
+    Parameters:
+    - df (pd.DataFrame): DataFrame containing 'input', 'question', and 'answer' columns.
+    
+    Returns:
+    - None
+    """
+
+    try:
+        df["embedding"] = [
+            embedding_model.get_text_embedding([q])[0] 
+            for q in tqdm(df["input"], desc="Generating Embeddings")
+        ]
+    except Exception as e:
+        logger.error(f"Error generating embeddings: {e}")
+        return
+
+    # # Upload data to Pinecone in batches
+    BATCH_SIZE = 500
+
+    for i in tqdm(range(0, len(df), BATCH_SIZE), desc="Uploading Data to Pinecone"):
+        batch = df.iloc[i : i + BATCH_SIZE]
+    
+        vectors = []
+        for idx, (embedding, (_, row_data)) in enumerate(zip(batch["embedding"], batch.iterrows())):
+            vector_id = f"q_{i + idx}"  # Ensures IDs remain unique across batches
+            metadata = {
+                "question": row_data.get("input"),
+                "answer": row_data.get("output")
+            }
+            vectors.append((vector_id, embedding, metadata))
+
+        try:
+            index.upsert(vectors)
+        except Exception as e:
+            logger.error(f"Error uploading batch starting at index {i}: {e}")
+
+    logger.info("All question-answer pairs stored successfully!")
+
+
+# df = dataset.get_data_set()[19000:21000]
+# upsert_data_in_db(df)
 # response = search_vector_store("What is the treatment for diabetes?")
 # print(response)
-
-
-def upsert_data_in_db(df: pd.DataFrame):
-    df["embedding"] = [embedding_model.get_text_embedding([q])[0] for q in tqdm(df["input"], desc="Embedding Questions")]
-
-    # Upload data to Pinecone in batches
-    BATCH_SIZE = 100
-    vectors = []
-
-    for i in tqdm(range(0, len(df), BATCH_SIZE), desc="Storing Data in Pinecone"):
-        batch = df.iloc[i : i + BATCH_SIZE]
-        vectors = [
-            (f"q_{idx}", emb, {"question": row[0], "answer": row[1], "instruction": row[2]}) 
-            for idx, (emb, row) in enumerate(zip(batch["embedding"], batch.iterrows()))
-        ]
-        index.upsert(vectors)  # Upsert (insert or update) in Pinecone
-
-    print("✅ All question-answer pairs stored successfully!")
-
-upsert_data_in_db(df)

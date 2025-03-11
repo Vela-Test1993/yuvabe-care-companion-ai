@@ -7,3 +7,7 @@ class Chat_Response(BaseModel):
 
 class ChatRequest(BaseModel):
     conversation_history: List[Dict]
+
+class Add_Data_In_DB(BaseModel):
+    start: int
+    end: int

@@ -19,10 +19,9 @@ if prompt:
         endpoint = "/chat/db_response"
         response = common_fuctions.get_api_response(endpoint, [prompt])
         st.subheader("✅ Relevant question and answer pair found in the database.")
-        for metadata_group in response["metadatas"]:
-            for entry in metadata_group:
-                st.write("Question:", entry["question"])
-                st.write("Answer:", entry["answer"])
+        for metadata in response:
+                st.write("Question:", metadata["question"])
+                st.write("Answer:", metadata["answer"])
                 st.write("-" * 80) 
 
         if st.button("Clear chat"):

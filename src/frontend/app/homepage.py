@@ -60,11 +60,11 @@ def handle_user_input():
             response = "⚠️ Oops! Something went wrong. Please try again."
 
         with st.chat_message("assistant"):
-            st.markdown(response)
+            st.markdown(response['response'])
 
         st.session_state.messages.append({"role": "assistant", "content": response})
 
-        logger.info(f"Assistant response: {response[:100]}...")
+        logger.info(f"Assistant response: {response['response'][:100]}...")
 
 # def handle_user_input():
 

@@ -9,5 +9,3 @@ torchvision
 torchaudio
 sentence_transformers
 groq
-chromadb
-uvicorn

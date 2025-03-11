@@ -1,11 +1,9 @@
 from sentence_transformers import SentenceTransformer
 from utils import logger
-from fastapi import UploadFile
-from PIL import Image
 
 logger = logger.get_logger()
 
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def get_text_embedding(search_query: str):
     try:

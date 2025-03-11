@@ -138,7 +138,27 @@ def get_retrieved_context(prompt: str) -> str:
         return "\n".join(retrieved_contexts[:3])
     return "No relevant information found in the database."
 
-data_set = dataset.get_data_set()[6139:10000]
-process_and_upsert_data(index, data_set)
+df = dataset.get_data_set()[6:200]
+# process_and_upsert_data(index, data_set)
 # response = search_vector_store("What is the treatment for diabetes?")
 # print(response)
+
+
+def upsert_data_in_db(df: pd.DataFrame):
+    df["embedding"] = [embedding_model.get_text_embedding([q])[0] for q in tqdm(df["input"], desc="Embedding Questions")]
+
+    # Upload data to Pinecone in batches
+    BATCH_SIZE = 100
+    vectors = []
+
+    for i in tqdm(range(0, len(df), BATCH_SIZE), desc="Storing Data in Pinecone"):
+        batch = df.iloc[i : i + BATCH_SIZE]
+        vectors = [
+            (f"q_{idx}", emb, {"question": row[0], "answer": row[1], "instruction": row[2]}) 
+            for idx, (emb, row) in enumerate(zip(batch["embedding"], batch.iterrows()))
+        ]
+        index.upsert(vectors)  # Upsert (insert or update) in Pinecone
+
+    print("✅ All question-answer pairs stored successfully!")
+
+upsert_data_in_db(df)

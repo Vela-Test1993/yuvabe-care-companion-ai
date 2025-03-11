@@ -16,7 +16,7 @@ def img_to_base64(image_path):
         logger.error(f"Error converting image to base64: {str(e)}")
         return None
     
-API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def send_chat_to_backend(endpoint, conversation_history):
     response = requests.post(f"{API_URL}/{endpoint}", json={"conversation_history": conversation_history})

@@ -1,7 +1,7 @@
 import os
 from groq import Groq
 from utils import logger
-from data import chroma_db
+# from data import chroma_db
 from data import pinecone_db
 from dotenv import load_dotenv
 

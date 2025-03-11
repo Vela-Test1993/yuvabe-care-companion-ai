@@ -24,10 +24,6 @@ ENV TRANSFORMERS_CACHE="/app/.cache/huggingface"
 # Set Python path
 ENV PYTHONPATH="/app/src"
 
-# Add a script to manage process control
-COPY wait-for-it.sh /usr/local/bin/wait-for-it
-RUN chmod +x /usr/local/bin/wait-for-it
-
 # Expose ports for both FastAPI (8000) and Streamlit (7860)
 EXPOSE 8000 7860
 

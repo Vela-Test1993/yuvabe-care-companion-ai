@@ -136,7 +136,7 @@ def upsert_data_in_db(df: pd.DataFrame):
     
         vectors = []
         for idx, (embedding, (_, row_data)) in enumerate(zip(batch["embedding"], batch.iterrows())):
-            vector_id = f"q_{i + idx}"  # Ensures IDs remain unique across batches
+            vector_id = f"question_{i + idx}"  # Ensures IDs remain unique across batches
             metadata = {
                 "question": row_data.get("input"),
                 "answer": row_data.get("output")

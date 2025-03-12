@@ -1,4 +1,5 @@
-from app import homepage
+from app import common_fuctions
+import streamlit as st
 
-homepage.setup_homepage()
+common_fuctions.config_homepage(st)
 

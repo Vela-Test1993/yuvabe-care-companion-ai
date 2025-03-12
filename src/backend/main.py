@@ -1,7 +1,33 @@
 from fastapi import FastAPI
-from routes import chat_api,upsert_data
+from routes import knowledge_base_api
+from fastapi.middleware.cors import CORSMiddleware
+from utils import logger 
 
-app = FastAPI()
+# Initialize FastAPI app
+app = FastAPI(
+    title="HealthCare VectorDB API",
+    description="API for managing Pinecone VectorDB operations for healthcare data.",
+    version="1.0.0"
+)
 
-app.include_router(chat_api.router, prefix="/chat", tags=["chat"])
-app.include_router(upsert_data.router, prefix="/data", tags=["data"])
+# Logger setup
+logger = logger.get_logger()
+
+# CORS Middleware (for better cross-origin request handling)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust for security if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include API routes
+app.include_router(knowledge_base_api.router, prefix="/knowledge-base", tags=['Knowledge Base Operations'])
+
+
+# Health Check Endpoint
+@app.get("/health", tags=["Health Check"])
+async def health_check():
+    return {"status": "API is healthy and running."}
+

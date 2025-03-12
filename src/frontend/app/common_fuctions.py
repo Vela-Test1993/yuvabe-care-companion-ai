@@ -8,8 +8,35 @@ import time
 
 load_dotenv()
 logger = logger.get_logger()
+PAGE_TITLE = "Yuvabe Care Companion AI"
+PAGE_LAYOUT = "wide"
+PAGE_ICON = "src/frontend/images/page_icon.jpg"
+GITHUB_LINK = "https://github.com/Vela-Test1993/yuvabe-care-companion-ai"
+ABOUT_US = "An AI-powered assistant for personalized healthcare guidance."
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+def config_homepage(st):
+    st.set_page_config(
+    page_title=PAGE_TITLE,
+    page_icon= PAGE_ICON,
+    layout=PAGE_LAYOUT,
+    initial_sidebar_state="auto",
+    menu_items={"Get help":GITHUB_LINK,
+                "Report a bug": GITHUB_LINK,
+                "About": ABOUT_US}
+    )
+
+    st.markdown(f"""
+        <h1 style="color: darkblue; text-align: left; font-size: 50px;">
+        <i>{PAGE_TITLE} 🏥⚕️🤖</i>
+        </h1>
+        """, unsafe_allow_html=True
+    )
+
+    logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
+    st.session_state.config_status = False
+    st.markdown("<hr>", unsafe_allow_html=True)  # To add a Horizontal line below title
 
 def img_to_base64(image_path):
     """Convert image to base64."""
@@ -30,10 +57,6 @@ def typewriter_effect(st, text, speed=0.01):
         placeholder.markdown(displayed_text)
         time.sleep(speed)
     
-def send_chat_to_backend(endpoint, conversation_history):
-    response = requests.post(f"{API_URL}/{endpoint}", json={"conversation_history": conversation_history})
-    return response.json().get("response", "⚠️ Failed to fetch response.")
-
 def get_api_response(endpoint:str, prompt: list):
     try:
         logger.info(f"Sending user prompt to API endpoint: {API_URL}{endpoint}")
@@ -75,3 +98,30 @@ def initialize_conversation():
         {"role": "assistant", "content": assistant_message}
     ]
     return conversation_history
+
+
+
+
+
+
+
+
+
+
+
+def fetch_response(prompt, chat_history):
+    try:
+        # Prepare data for API request
+        payload = {
+            "chat_history": chat_history,
+            "latest_prompt": prompt
+        }
+        response = requests.post(API_URL, json=payload, timeout=15)
+
+        if response.status_code == 200:
+            return response.json().get("response", "Sorry, I couldn't generate a response.")
+        else:
+            return "Error: Unable to connect to the backend."
+
+    except requests.exceptions.RequestException as e:
+        return f"Error: {str(e)}"

@@ -5,9 +5,13 @@ class Chat_Response(BaseModel):
     prompt: Optional[List] = None
     response: Optional[Dict] = None
 
-class ChatRequest(BaseModel):
-    conversation_history: List[Dict]
+class UpsertRequest(BaseModel):
+    data: list  # Expecting a list of JSON objects (rows of data)
 
-class Add_Data_In_DB(BaseModel):
-    start: int
-    end: int
+class DeleteRequest(BaseModel):
+    ids_to_delete: list
+
+class MetadataRequest(BaseModel):
+    prompt: str
+    n_result: int = 3
+    score_threshold: float = 0.45

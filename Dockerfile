@@ -20,7 +20,6 @@ RUN mkdir -p /app/logs /app/.cache/huggingface && chmod -R 777 /app/logs /app/.c
 RUN apt-get update && apt-get install -y tmux curl
 
 # Ensure the Hugging Face cache is set correctly
-ENV TRANSFORMERS_CACHE="/app/.cache/huggingface"
 ENV HF_HOME="/app/.cache/huggingface"
 
 # Set Python path

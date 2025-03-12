@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 from utils import logger
 import json
+import time
 
 load_dotenv()
 logger = logger.get_logger()
@@ -16,6 +17,16 @@ def img_to_base64(image_path):
     except Exception as e:
         logger.error(f"Error converting image to base64: {str(e)}")
         return None
+    
+def typewriter_effect(st, text, speed=0.01):
+    """Displays text with a realistic typewriter effect (character by character)."""
+    placeholder = st.empty()
+    displayed_text = ""
+    
+    for char in text:
+        displayed_text += char
+        placeholder.markdown(displayed_text)
+        time.sleep(speed)
     
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 

@@ -60,9 +60,10 @@ def handle_user_input():
             response = "⚠️ Oops! Something went wrong. Please try again."
 
         with st.chat_message("assistant"):
-            st.markdown(response['response'])
+            common_fuctions.typewriter_effect(st, response['response'])
+            # st.markdown(response['response'])
 
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response['response']})
 
         logger.info(f"Assistant response: {response['response'][:100]}...")
 

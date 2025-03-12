@@ -18,7 +18,7 @@ def get_data_set():
             df = pd.read_csv(DATASET_PATH).fillna("")
 
         # Cleaning logic for both Parquet and CSV data
-        df.drop_duplicates(subset=["input", "output"], inplace=True)
+        df.drop_duplicates(subset=["input", "output","instruction"], inplace=True)
 
         # Remove NaN values or empty strings
         df = df[df["input"].str.strip().notna() & df["output"].str.strip().notna()]
@@ -28,6 +28,7 @@ def get_data_set():
         translator = str.maketrans('', '', string.punctuation)
         df["input"] = df["input"].fillna("").str.lower().str.translate(translator)
         df["output"] = df["output"].fillna("").str.lower().str.translate(translator)
+        df["instruction"] = df["instruction"].fillna("").str.lower().str.translate(translator)
 
         # Save only if data is present
         if not os.path.exists(DATASET_PATH):

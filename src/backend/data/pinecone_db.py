@@ -136,15 +136,16 @@ def upsert_data_in_db(df: pd.DataFrame):
     
         vectors = []
         for idx, (embedding, (_, row_data)) in enumerate(zip(batch["embedding"], batch.iterrows())):
-            vector_id = f"question_{i + idx}"  # Ensures IDs remain unique across batches
+            vector_id = f"q{row_data.get("input")[:50]}:{i + idx}"  # Ensures IDs remain unique across 
             metadata = {
                 "question": row_data.get("input"),
-                "answer": row_data.get("output")
+                "answer": row_data.get("output"),
+                "instruction": row_data.get("instruction"),
             }
             vectors.append((vector_id, embedding, metadata))
 
         try:
-            index.upsert(vectors)
+            index.upsert(vectors=vectors,namespace=NAMESPACE)
         except Exception as e:
             logger.error(f"Error uploading batch starting at index {i}: {e}")
 

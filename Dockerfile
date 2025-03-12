@@ -14,6 +14,8 @@ COPY . /app
 
 # Create logs directory with proper permissions
 RUN mkdir -p /app/logs /app/.cache/huggingface && chmod -R 777 /app/logs /app/.cache/huggingface
+RUN mkdir -p /app/src/backend/data && chmod 775 /app/src/backend/data
+
 
 
 # Install additional dependencies

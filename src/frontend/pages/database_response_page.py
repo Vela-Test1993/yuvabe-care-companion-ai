@@ -20,8 +20,12 @@ if prompt:
         response = common_fuctions.get_api_response(endpoint, [prompt])
         st.subheader("✅ Relevant question and answer pair found in the database.")
         for metadata in response:
-                common_fuctions.typewriter_effect(st, "Question: " + metadata["question"])
-                common_fuctions.typewriter_effect(st, "Answer: " + metadata["answer"])
+                st.write("Question")
+                question = metadata["question"]
+                common_fuctions.typewriter_effect(st, question)
+                st.write("Answer")
+                answer = metadata["answer"]
+                common_fuctions.typewriter_effect(st, answer)
                 st.write("-" * 80)
 
         if st.button("Clear chat"):

@@ -1,7 +1,7 @@
 import os
-import sys
-src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
-sys.path.append(src_directory)
+# import sys
+# src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
+# sys.path.append(src_directory)
 from pinecone import Pinecone, ServerlessSpec
 import time
 from tqdm import tqdm  # Progress bar for large datasets

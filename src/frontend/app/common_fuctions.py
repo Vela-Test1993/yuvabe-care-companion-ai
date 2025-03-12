@@ -9,6 +9,8 @@ import time
 load_dotenv()
 logger = logger.get_logger()
 
+API_URL = os.getenv("API_URL", "http://localhost:8000")
+
 def img_to_base64(image_path):
     """Convert image to base64."""
     try:
@@ -28,8 +30,6 @@ def typewriter_effect(st, text, speed=0.01):
         placeholder.markdown(displayed_text)
         time.sleep(speed)
     
-API_URL = os.getenv("API_URL", "http://localhost:8000")
-
 def send_chat_to_backend(endpoint, conversation_history):
     response = requests.post(f"{API_URL}/{endpoint}", json={"conversation_history": conversation_history})
     return response.json().get("response", "⚠️ Failed to fetch response.")

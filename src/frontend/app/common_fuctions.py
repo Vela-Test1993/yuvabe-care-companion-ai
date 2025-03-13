@@ -16,7 +16,7 @@ ABOUT_US = "An AI-powered assistant for personalized healthcare guidance."
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-def config_homepage(st):
+def config_homepage(st, page_title=PAGE_TITLE):
     st.set_page_config(
     page_title=PAGE_TITLE,
     page_icon= PAGE_ICON,
@@ -26,17 +26,15 @@ def config_homepage(st):
                 "Report a bug": GITHUB_LINK,
                 "About": ABOUT_US}
     )
+    logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
 
+def set_page_title(st, page_title=PAGE_TITLE):
     st.markdown(f"""
         <h1 style="color: darkblue; text-align: left; font-size: 50px;">
         <i>{PAGE_TITLE} 🏥⚕️🤖</i>
         </h1>
         """, unsafe_allow_html=True
     )
-
-    logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
-    st.session_state.config_status = False
-    st.markdown("<hr>", unsafe_allow_html=True)  # To add a Horizontal line below title
 
 def img_to_base64(image_path):
     """Convert image to base64."""

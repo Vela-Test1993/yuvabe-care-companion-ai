@@ -15,31 +15,30 @@ def render_homepage():
              use_container_width=True, 
              caption="Your AI-Powered Health Companion")
 
-    st.markdown("""
-    ### 👋 Welcome to the Yuvabe Care Companion AI!
-    This platform offers comprehensive tools to support your healthcare journey. Use the tabs below to navigate:
-    """)
-
-    # Feature Overview Section
-    st.markdown("""
-    ### 🔹 Key Features
-    - **Admin Portal** — Manage records, data, and configurations efficiently.
-    - **Knowledge Base Explorer** — Leverage advanced vector search to find relevant knowledge entries with precision.
-    - **Patient Assistance** — Personalized guidance to help patients describe their concerns.
-
-    > 💡 *Explore each section for detailed functionality.*
-    """)
-
     # Navigation Tabs
     Home, Admin_Portal, Knowledge_Base_Explorer = st.tabs(
         ["🏠 Home", "🔒 Admin Portal", "📚 Knowledge Base Explorer"]
     )
 
     with Home:
-        st.markdown("### 🌟 Getting Started")
+        # st.markdown("### 🌟 Getting Started")
+        # st.markdown("""
+        # - Select **Admin Portal** for system configurations and data management.
+        # - Go to **Knowledge Base Explorer** to explore and manage knowledge entries.
+        # """)
         st.markdown("""
-        - Select **Admin Portal** for system configurations and data management.
-        - Go to **Knowledge Base Explorer** to explore and manage knowledge entries.
+        ### 👋 Welcome to the Yuvabe Care Companion AI!
+        This platform offers comprehensive tools to support your healthcare journey. Use the tabs above to navigate:
+        """)
+
+        # Feature Overview Section
+        st.markdown("""
+        ### 🔹 Key Features
+        - **Admin Portal** — Manage records, data, and configurations efficiently.
+        - **Knowledge Base Explorer** — Leverage advanced vector search to find relevant knowledge entries with precision.
+        - **Patient Assistance** — Personalized guidance to help patients describe their concerns.
+
+        > 💡 *Explore each section for detailed functionality.*
         """)
 
     with Admin_Portal:

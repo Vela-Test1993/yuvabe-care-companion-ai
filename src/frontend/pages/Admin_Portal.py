@@ -1,12 +1,11 @@
 import streamlit as st
 from app import pinecone_data_handler
 
+# Page Configuration
+# st.set_page_config(page_title="Admin Portal", page_icon="🔒", layout="wide")
 def render_admin_portal():
     """Renders the Admin Portal page with improved UI and navigation."""
     
-    # Page Configuration
-    st.set_page_config(page_title="Admin Portal", page_icon="🔒", layout="wide")
-
     # Header Section
     st.title("🔒 Admin Portal")
     st.markdown("""
@@ -33,6 +32,7 @@ def render_admin_portal():
     # Sidebar for Navigation
     st.sidebar.title("🔀 Navigation")
     st.sidebar.markdown("[🏠 Home](http://localhost:8501)", unsafe_allow_html=True)
+    st.sidebar.markdown("[🔒 Knowledge Base](http://localhost:8501/Knowledge_Base_Explorer)", unsafe_allow_html=True)
 
 # Call the function to render the Admin Portal
 if __name__ == "__main__":

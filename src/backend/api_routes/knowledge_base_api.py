@@ -4,7 +4,7 @@ from models.schemas import UpsertRequest,DeleteRequest,MetadataRequest
 from data import pinecone_db
 import pandas as pd
 
-router = APIRouter()
+router = APIRouter(prefix="/knowledge-base", tags=['Knowledge Base Operations'])
 
 @router.post("/upsert-data")
 def upsert_data(request: UpsertRequest):

@@ -3,10 +3,13 @@ requests
 Pillow
 pandas
 fastapi[standard]
-pinecone
 torch
 torchvision
 torchaudio
 transformers
-sentence_transformers
 groq
+sentence-transformers
+pinecone
+supabase
+langchain
+uvicorn

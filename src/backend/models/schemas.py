@@ -15,3 +15,12 @@ class MetadataRequest(BaseModel):
     prompt: str
     n_result: int = 3
     score_threshold: float = 0.45
+
+class ChatRequest(BaseModel):
+    query: str
+
+class ChatResponse(BaseModel):
+    response: str
+
+class ChatHistoryResponse(BaseModel):
+    date: str

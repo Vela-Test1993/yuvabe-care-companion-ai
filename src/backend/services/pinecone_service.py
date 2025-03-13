@@ -8,7 +8,10 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from utils import logger
 import pandas as pd
-from models import embedding_model
+from services.embedding_service import get_text_embedding
+from sentence_transformers import CrossEncoder
+
+reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
 
 load_dotenv()
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
@@ -16,6 +19,18 @@ logger = logger.get_logger()
 NAMESPACE = "health-care-dataset"
 INDEX_NAME = "health-care-index"
 PINECONE = Pinecone(api_key=PINECONE_API_KEY)
+
+def rerank_results(query, results, score_threshold=0.5):
+    pairs = [(query, result["metadata"]["question"]) for result in results]
+    scores = reranker.predict(pairs)
+    
+    # Filter based on score threshold
+    filtered_results = [
+        result for score, result in zip(scores, results) if score >= score_threshold
+    ]
+    
+    # Sort remaining results by score in descending order
+    return sorted(filtered_results, key=lambda x: x['score'], reverse=True)
 
 def initialize_pinecone_index(pinecone, index_name, dimension=384, metric="cosine", cloud="aws", region="us-east-1"):
     """
@@ -113,49 +128,14 @@ def delete_records_by_ids(ids_to_delete):
 
 def retrieve_relevant_metadata(prompt, n_result=3, score_threshold=0.47):
     """
-    Retrieves relevant context data based on a given prompt and extracts metadata.
-
-    This method queries the Pinecone index with the provided prompt's embedding,
-    fetches the top `n_result` entries, and filters out entries with a score below 
-    the specified threshold. Extracted metadata is formatted and returned.
-
-    Args:
-        prompt (str or list): 
-            The input prompt used to generate the text embedding. 
-            If a list is provided, the method extracts the last element.
-        n_result (int, optional): 
-            The number of relevant results to return. Defaults to 3.
-        score_threshold (float, optional): 
-            The minimum score required for an entry to be included in the results. Defaults to 0.5.
-
-    Returns:
-        list: A list of dictionaries containing:
-            - `"question"` (str): Extracted question or `"N/A"` if unavailable.
-            - `"answer"` (str): Extracted answer or `"N/A"` if unavailable.
-            - `"instruction"` (str): Extracted instruction or `"N/A"` if unavailable.
-            - `"score"` (str): The score value as a string for consistency.
-
-        If no relevant entries are found, the list will contain a single
-        dictionary with the key `"response"` and a message indicating no data was found.
-
-    Example:
-        >>> prompt = ["Tell me about mental health"]
-        >>> fetch_and_extract_metadata(prompt, n_result=2)
-        [{'question': 'What is mental health?', 'answer': 'Mental health refers to...', 
-          'instruction': 'Focus on general well-being.', 'score': '0.6'}]
-
-    Notes:
-        - Assumes `get_or_create_index()` initializes the index object.
-        - Uses `embedding_model.get_text_embedding()` to generate text embeddings.
-        - Entries without a `metadata` key or with missing fields default to `"N/A"`.
-        - Entries with a score below `score_threshold` are excluded from results.
+    Retrieves and reranks relevant context data based on a given prompt.
     """
     try:
         index = initialize_pinecone_index(PINECONE, INDEX_NAME)
         prompt = prompt[-1] if isinstance(prompt, list) else prompt
 
         # Generate embedding for the provided prompt
-        embedding = embedding_model.get_text_embedding(prompt)
+        embedding = get_text_embedding(prompt)
         response = index.query(
             top_k=n_result,
             vector=embedding,
@@ -163,8 +143,8 @@ def retrieve_relevant_metadata(prompt, n_result=3, score_threshold=0.47):
             include_metadata=True
         )
 
-        # Extract and filter metadata
-        metadata = [
+        # Extract metadata and filter by score threshold
+        filtered_results = [
             {
                 "question": entry.get('metadata', {}).get('question', 'N/A'),
                 "answer": entry.get('metadata', {}).get('answer', 'N/A'),
@@ -176,12 +156,28 @@ def retrieve_relevant_metadata(prompt, n_result=3, score_threshold=0.47):
             if entry.get('score', 0) >= score_threshold
         ]
 
+        # Rerank the filtered results using a reranker model
+        if filtered_results:
+            pairs = [(prompt, item["question"]) for item in filtered_results]
+            scores = reranker.predict(pairs)  # Predict relevance scores
+
+            # Attach reranker scores and sort by relevance
+            for item, score in zip(filtered_results, scores):
+                item["reranker_score"] = score
+
+            filtered_results = sorted(
+                filtered_results, 
+                key=lambda x: x["reranker_score"], 
+                reverse=True
+            )
+
         # Return metadata or fallback message
-        return metadata if metadata else [{"response": "No relevant data found."}]
+        return filtered_results if filtered_results else [{"response": "No relevant data found."}]
 
     except Exception as e:
         logger.error(f"Failed to fetch context for '{prompt[:20]}'. Error: {e}")
         return [{"response": "Failed to fetch data due to an error."}]
+
 
 def upsert_vector_data(df: pd.DataFrame):
 
@@ -198,7 +194,7 @@ def upsert_vector_data(df: pd.DataFrame):
     try:
         index = initialize_pinecone_index(PINECONE,INDEX_NAME)
         df["embedding"] = [
-            embedding_model.get_text_embedding([q])[0] 
+            get_text_embedding([q])[0] 
             for q in tqdm(df["input"], desc="Generating Embeddings")
         ]
     except Exception as e:
@@ -228,3 +224,28 @@ def upsert_vector_data(df: pd.DataFrame):
             logger.error(f"Error uploading batch starting at index {i}: {e}")
 
     logger.info("All question-answer pairs stored successfully!")
+
+def retrieve_context_from_pinecone(prompt, n_result=3, score_threshold=0.5):
+
+    index = initialize_pinecone_index(PINECONE,INDEX_NAME)
+    # Generate embedding for the provided prompt
+    embedding = get_text_embedding(prompt)
+    # Query Pinecone for relevant context
+    response = index.query(
+        top_k=n_result,
+        vector=embedding,
+        namespace="your_namespace",
+        include_metadata=True
+    )
+
+    # Extract metadata and filter results
+    filtered_results = [
+        entry['metadata'].get('question', 'N/A')
+        for entry in response.get('matches', [])
+        if entry.get('score', 0) >= score_threshold
+    ]
+
+    # Combine the context into a single string
+    context = "\n".join(filtered_results) if filtered_results else "No relevant context found."
+    
+    return context

@@ -100,3 +100,20 @@ Once launched, interact with Yuvabe Care Companion AI as follows:
 ## Contributions
 
 If you'd like to contribute to Yuvabe Care Companion AI, please fork the repository and create a pull request with your features or fixes.
+
+📋 Recommended Tech Stack (Enhanced)
+Library/Framework	Purpose
+streamlit	For building the chatbot UI with a simple and interactive interface.
+fastapi[standard]	For creating scalable APIs to manage backend logic and endpoints.
+uvicorn	Fast ASGI server for running FastAPI apps.
+requests	For making HTTP requests (e.g., fetching data from APIs).
+Pillow	For handling and processing images in chat responses (if needed).
+pandas	For data manipulation and analysis.
+torch, torchvision, torchaudio	For model inference and custom model development (if required).
+transformers	For powerful NLP models like GPT, LLaMA, or Mistral.
+sentence_transformers	For efficient text embeddings.
+groq	For ultra-fast model inference.
+sentence-transformers	For additional embedding options and fine-tuning.
+pinecone-client	For vector search and storage (ideal for RAG architecture).
+supabase	For efficient, scalable chat history storage.
+langchain	For implementing text chunking, prompt chaining, and retrieval pipelines

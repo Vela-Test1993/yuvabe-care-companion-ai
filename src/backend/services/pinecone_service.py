@@ -1,7 +1,7 @@
 import os
-# import sys
-# src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
-# sys.path.append(src_directory)
+import sys
+src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
+sys.path.append(src_directory)
 from pinecone import Pinecone, ServerlessSpec
 import time
 from tqdm import tqdm
@@ -234,13 +234,13 @@ def retrieve_context_from_pinecone(prompt, n_result=3, score_threshold=0.5):
     response = index.query(
         top_k=n_result,
         vector=embedding,
-        namespace="your_namespace",
+        namespace=NAMESPACE,
         include_metadata=True
     )
 
     # Extract metadata and filter results
     filtered_results = [
-        entry['metadata'].get('question', 'N/A')
+        entry['metadata'].get('answer', 'N/A')
         for entry in response.get('matches', [])
         if entry.get('score', 0) >= score_threshold
     ]
@@ -249,3 +249,6 @@ def retrieve_context_from_pinecone(prompt, n_result=3, score_threshold=0.5):
     context = "\n".join(filtered_results) if filtered_results else "No relevant context found."
     
     return context
+
+x = retrieve_context_from_pinecone("I'm not feeling well")
+print(x)

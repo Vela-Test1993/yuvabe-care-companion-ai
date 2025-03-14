@@ -9,3 +9,6 @@ class ChatResponse(BaseModel):
 
 class ChatHistoryResponse(BaseModel):
     date: str = Field(..., description="Date of the chat history in 'YYYY-MM-DD' format")
+
+class ConversationInput(BaseModel):
+    conversation_history: list[dict]

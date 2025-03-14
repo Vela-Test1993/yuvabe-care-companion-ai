@@ -83,19 +83,28 @@ def upsert_data_request(start, end):
     except Exception as err:
         print(f"An error occurred: {err}")
     
-def initialize_conversation():
+# def initialize_conversation():
+#     """
+#     Initialize the conversation history with system and assistant messages.
 
-    assistant_message = "Hello! I am Yuvabe Care Companion AI. How can I assist you with your health-related queries today?"
+#     Returns:
+#     - list: Initialized conversation history.
+#     """
+#     assistant_message = (
+#         "Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. "
+#         "I can provide information about common symptoms, medications, treatments, and wellness tips. "
+#         "How can I help you today?"
+#     )
 
-    conversation_history = [
-        {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance on medical, mental health, and wellness topics."},
-        {"role": "system", "content": "Yuvabe Care Companion AI is powered by the LLaMA 3.3-70B Versatile model, optimized for comprehensive and responsible healthcare support."},
-        {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024, but you are NOT a replacement for professional medical advice."},
-        {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses while reminding users to consult healthcare professionals when necessary."},
-        {"role": "system", "content": "You were created by Velu R, an AI model developer."},
-        {"role": "assistant", "content": assistant_message}
-    ]
-    return conversation_history
+#     conversation_history = [
+#         {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance on medical, mental health, and wellness topics."},
+#         {"role": "system", "content": "Yuvabe Care Companion AI is powered by the LLaMA 3.3-70B Versatile model, optimized for comprehensive and responsible healthcare support."},
+#         {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024, but you are NOT a replacement for professional medical advice."},
+#         {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses while reminding users to consult healthcare professionals when necessary."},
+#         {"role": "system", "content": "You were created by Velu R, an AI model developer."},
+#         {"role": "assistant", "content": assistant_message}
+#     ]
+#     return conversation_history
 
 
 

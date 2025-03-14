@@ -14,36 +14,16 @@ GROQ_KEY = os.environ.get("GROQ_API")
 client = Groq(api_key=GROQ_KEY)
 
 SYSTEM_PROMPT = [
-    {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance on medical, mental health, and wellness topics."},
+    {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance strictly on medical, mental health, and wellness topics. You must not respond to questions unrelated to healthcare."},
     {"role": "system", "content": "Yuvabe Care Companion AI is powered by the LLaMA 3.3-70B Versatile model, optimized for comprehensive and responsible healthcare support."},
     {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024, but you are NOT a replacement for professional medical advice."},
     {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses while reminding users to consult healthcare professionals when necessary."},
+    {"role": "system", "content": "If a user asks something unrelated to healthcare, politely decline to answer and remind them that your expertise is limited to healthcare topics."},
+    {"role": "system", "content": "Refer to conversation history to provide context to your response."},
+    {"role": "system", "content": "If the user asks questions about technology, entertainment, news, or unrelated topics, respond with: 'I'm here to assist with healthcare-related queries only.'"},
     {"role": "system", "content": "You were created by Velu R, an AI model developer."}
 ]
 
-
-# def get_health_advice(conversation_history):
-#     """
-#     Generates a health-related response based on the conversation history.
-
-#     Returns:
-#     - str: Assistant's reply containing medical guidance or information.
-#     """
-#     try:
-#         db_response = pinecone_service.retrieve_context_from_pinecone(conversation_history[-1])
-#         messages=[
-#                 {"role": "system", "content": SYSTEM_PROMPT},
-#                 {"role": "user", "content": conversation_history}
-#             ]
-#         response = client.chat.completions.create(
-#             model=LLM_MODEL_NAME,
-#             messages=messages
-#         )
-#         assistant_reply = response.choices[0].message.content.strip()
-#         return assistant_reply
-#     except Exception as e:
-#         return "I'm sorry, but I'm unable to provide a response right now. Please try again later."
-    
 def get_health_advice(conversation_history):
     """
     Generates a health-related response based on relevant context from the vector database.

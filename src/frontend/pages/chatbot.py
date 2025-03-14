@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+from app import common_fuctions
 
 API_URL = "http://localhost:8000/chat/get-health-advice/"
+NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 
 # Initialize conversation history
 def initialize_conversation():
@@ -32,9 +34,15 @@ if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = initialize_conversation()
 
 # Display chat history
-for message in st.session_state.conversation_history:
-    with st.chat_message(message['role']):
-        st.markdown(message['content'])
+for message in st.session_state.conversation_history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+    role = message["role"]
+    avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
+    with st.chat_message(role, avatar=avatar_image):
+        st.write(message["content"])
+
+# for message in st.session_state.conversation_history:
+#     with st.chat_message(message['role']):
+#         st.markdown(message['content'])
 
 # User Input
 user_input = st.chat_input("Ask your health-related question:")
@@ -55,4 +63,5 @@ if user_input:
 
     # Display only the assistant's latest response
     with st.chat_message('assistant'):
-        st.markdown(assistant_reply)
+        common_fuctions.typewriter_effect(st,assistant_reply)
+        # st.markdown(assistant_reply)

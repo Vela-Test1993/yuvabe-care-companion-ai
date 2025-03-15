@@ -12,3 +12,7 @@ class ChatHistoryResponse(BaseModel):
 
 class ConversationInput(BaseModel):
     conversation_history: list[dict]
+
+class ChatHistoryRequest(BaseModel):
+    user_query: str
+    assistant_response: str

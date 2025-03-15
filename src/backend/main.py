@@ -34,6 +34,7 @@
 from fastapi import FastAPI
 from api_routes.chat_api import router as chat_router
 from api_routes.knowledge_base_api import router as knowledge_base_router
+from api_routes.chat_history_db_api import router as chat_history_router
 
 app = FastAPI(
     title="Yuvabe Care Companion AI",
@@ -44,3 +45,4 @@ app = FastAPI(
 # Register Routes
 app.include_router(chat_router)
 app.include_router(knowledge_base_router)
+app.include_router(chat_history_router)

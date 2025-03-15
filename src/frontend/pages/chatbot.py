@@ -4,14 +4,13 @@ from app import common_fuctions
 
 API_URL = "http://localhost:8000/chat/get-health-advice/"
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-
+common_fuctions.config_homepage(st)
+common_fuctions.set_page_title(st)
 # Initialize conversation history
 def initialize_conversation():
-    assistant_message = (
-        "Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. "
-        "I can provide information about common symptoms, medications, treatments, and wellness tips. "
-        "How can I help you today?"
-    )
+    assistant_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 
+                         "How can I help you today?")
+    
     return [{"role": "assistant", "content": assistant_message}]
 
 # Function to fetch advice from the API
@@ -26,9 +25,6 @@ def fetch_health_advice(conversation_history):
     except requests.exceptions.RequestException as e:
         st.error(f"❗ API Connection Error: {e}")
         return "I'm currently unable to respond. Please try again later."
-
-# Streamlit App
-st.title("🩺 Yuvabe Care Companion AI")
 
 if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = initialize_conversation()

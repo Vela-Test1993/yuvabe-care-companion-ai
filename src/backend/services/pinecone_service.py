@@ -249,6 +249,3 @@ def retrieve_context_from_pinecone(prompt, n_result=3, score_threshold=0.5):
     context = "\n".join(filtered_results) if filtered_results else "No relevant context found."
     
     return context
-
-x = retrieve_context_from_pinecone("I'm not feeling well")
-print(x)

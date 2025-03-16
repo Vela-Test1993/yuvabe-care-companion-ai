@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException,status
 from services.schemas import ChatHistoryRequest
 from services import supabase_service
 from utils import logger
@@ -15,6 +15,21 @@ def store_chat_history(chat_history : ChatHistoryRequest):
         return supabase_service.store_chat_history(conversation_id, messages)
     except Exception as e:
         raise f"Failed to create {e}"
+    
+@router.get('/get-history')
+def get_chat_history(conversation_id: str):
+    try:
+        chat_history = supabase_service.get_chat_history(conversation_id)
+        logger.info(f"Chat history retrieved successfully for conversation ID: {conversation_id}")
+        return chat_history
+    except Exception as e:
+        logger.error(f"Error retrieving chat history for ID {conversation_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve chat history. Please try again later."
+        )
+
+
     
 
 

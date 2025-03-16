@@ -29,12 +29,12 @@ def fetch_health_advice(conversation_history):
 if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = initialize_conversation()
 
-# Display chat history
-for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-    role = message["role"]
-    avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
-    with st.chat_message(role, avatar=avatar_image):
-        st.write(message["content"])
+# # Display chat history
+# for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+#     role = message["role"]
+#     avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
+#     with st.chat_message(role, avatar=avatar_image):
+#         st.write(message["content"])
 
 # User Input
 user_input = st.chat_input("Ask your health-related question:")
@@ -60,6 +60,8 @@ if user_input:
     # Append assistant's reply to conversation history first
     st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
     common_functions.store_chat_history_in_db(st.session_state.conversation_id,st.session_state.conversation_history)
+    common_functions.display_chat_history(st)
+
 
     # Display only the assistant's latest response
     with st.chat_message('assistant'):

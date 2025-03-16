@@ -52,37 +52,26 @@ def store_chat_history(conversation_id, new_messages):
         logger.error(f"Error: {e}")
         return {"error": str(e)}
 
-def get_chat_history(date):
+def get_chat_history(conversation_id):
     try:
-        prefix = f"{date}/"
-        files = supabase.storage.from_(SUPABASE_BUCKET).list(prefix)
-        chat_history = []
+        file_path = f"chat-history/{conversation_id}.json"
+        existing_data = supabase.storage.from_(SUPABASE_BUCKET).download(file_path)
+        
+        if existing_data:
+            chat_data = json.loads(existing_data.decode('utf-8'))
+            logger.info("Chat history retrieved successfully!")
+            return chat_data
+        else:
+            logger.warning("No chat history found for the given conversation ID.")
+            return {"message": "No chat history found."}
 
-        for file in files:
-            file_path = file['name']
-            response = supabase.storage.from_(SUPABASE_BUCKET).download(file_path)
-            chat_data = json.loads(response)
-            chat_history.append(chat_data)
-
-        return chat_history
     except Exception as e:
         logger.error(f"Error retrieving chat history: {e}")
-        return []
+        return {"error": str(e)}
 
-def create_bucket_with_file():
-    bucket_name = "chat-history"
+def create_bucket_with_file(bucket_name:str):
     try:
         supabase.storage.create_bucket(bucket_name)
-        print(f"Bucket '{bucket_name}' created successfully.")
+        logger.info(f"Bucket '{bucket_name}' created successfully.")
     except Exception as e:
-        print(f"Error creating bucket: {e}")
-
-
-
-conversation_id = "12345"
-messages = [
-    {"role": "system", "content": "Hello Friend."},
-]
-
-
-# store_chat_history(conversation_id,messages)
+        logger.error(f"Error creating bucket: {e}")

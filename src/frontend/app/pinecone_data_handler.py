@@ -1,5 +1,5 @@
 import requests
-from frontend.app import common_functions
+from app import common_functions
 import streamlit as st
 
 

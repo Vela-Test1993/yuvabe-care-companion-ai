@@ -1,5 +1,5 @@
 import streamlit as st
-from frontend.app import common_functions
+from app import common_functions
 from PIL import Image  
 
 def render_homepage():
@@ -7,6 +7,7 @@ def render_homepage():
 
     # Page Configuration
     common_functions.config_homepage(st)
+
     common_functions.set_page_title(st)
 
 
@@ -21,11 +22,6 @@ def render_homepage():
     )
 
     with Home:
-        # st.markdown("### 🌟 Getting Started")
-        # st.markdown("""
-        # - Select **Admin Portal** for system configurations and data management.
-        # - Go to **Knowledge Base Explorer** to explore and manage knowledge entries.
-        # """)
         st.markdown("""
         ### 👋 Welcome to the Yuvabe Care Companion AI!
         This platform offers comprehensive tools to support your healthcare journey. Use the tabs above to navigate:

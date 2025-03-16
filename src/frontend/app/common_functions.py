@@ -141,3 +141,31 @@ def store_chat_history_in_db(conversation_id, messages):
         logger.info("Successfully added the chat in db")
     except Exception as e:
         logger.info(f"Failed to add the chat in db {e}")
+
+def get_chat_history_from_db(conversation_id):
+    try:
+        API_URL = f"http://127.0.0.1:8000/chat-db/get-history"
+        response = requests.post(API_URL,params={"conversation_id": conversation_id})
+        response.raise_for_status()
+        logger.info(f"Successfully retrieved chat history for conversation ID: {conversation_id}")
+        return response.json()
+    except Exception as e:
+        logger.info(f"Failed to get the chat history")
+    return {"error": "Failed to retrieve chat history. Please try again later."}
+
+def display_chat_history(st):
+    conversation_id = st.session_state.get("conversation_id")
+    if not conversation_id:
+        st.warning("Conversation ID is missing. Please provide a valid ID.")
+        return
+
+    try:
+        chat_history = get_chat_history_from_db(conversation_id)
+        if chat_history and isinstance(chat_history, dict) and 'error' not in chat_history:
+            st.success("Chat history loaded successfully!")
+            if st.sidebar.button(f"Show History for {conversation_id}",key="show_history_button"):
+                st.json(chat_history)
+        else:
+            st.info("No chat history found for this conversation ID or the data format is incorrect.")
+    except Exception as e:
+        st.error(f"Error retrieving chat history: {e}")

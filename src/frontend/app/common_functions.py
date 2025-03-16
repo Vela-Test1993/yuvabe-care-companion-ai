@@ -132,3 +132,12 @@ def fetch_response(prompt, chat_history):
 
     except requests.exceptions.RequestException as e:
         return f"Error: {str(e)}"
+    
+def store_chat_history_in_db(conversation_id, messages):
+    try:
+        API_URL = f"http://localhost:8000/chat-db/store-history"
+        payload = {"conversation_id": conversation_id, 'messages': messages}
+        response = requests.post(API_URL, json=payload)
+        logger.info("Successfully added the chat in db")
+    except Exception as e:
+        logger.info(f"Failed to add the chat in db {e}")

@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
-from app import common_fuctions
+from app import common_functions
 
 API_URL = "http://localhost:8000/chat/get-health-advice/"
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-common_fuctions.config_homepage(st)
-common_fuctions.set_page_title(st)
+common_functions.config_homepage(st)
+common_functions.set_page_title(st)
 # Initialize conversation history
 def initialize_conversation():
     assistant_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 
@@ -30,34 +30,37 @@ if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = initialize_conversation()
 
 # Display chat history
-for message in st.session_state.conversation_history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
     role = message["role"]
     avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
     with st.chat_message(role, avatar=avatar_image):
         st.write(message["content"])
 
-# for message in st.session_state.conversation_history:
-#     with st.chat_message(message['role']):
-#         st.markdown(message['content'])
-
 # User Input
 user_input = st.chat_input("Ask your health-related question:")
 
+
 if user_input:
+
+    if 'conversation_id' not in st.session_state:
+        st.session_state.conversation_id = user_input.strip()[:50]
+
     # Display user's input
     with st.chat_message('user'):
-        st.markdown(user_input)
+        common_functions.typewriter_effect(st,user_input)
+        
 
     # Append user input to session history
     st.session_state.conversation_history.append({"role": "user", "content": user_input})
+    
 
     # Fetch assistant response
     assistant_reply = fetch_health_advice(st.session_state.conversation_history)
 
     # Append assistant's reply to conversation history first
     st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
+    common_functions.store_chat_history_in_db(st.session_state.conversation_id,st.session_state.conversation_history)
 
     # Display only the assistant's latest response
     with st.chat_message('assistant'):
-        common_fuctions.typewriter_effect(st,assistant_reply)
-        # st.markdown(assistant_reply)
+        common_functions.typewriter_effect(st,assistant_reply)

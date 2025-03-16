@@ -1,13 +1,13 @@
 import streamlit as st
-from app import common_fuctions
+from frontend.app import common_functions
 from PIL import Image  
 
 def render_homepage():
     """Renders the Yuvabe Care Companion AI homepage."""
 
     # Page Configuration
-    common_fuctions.config_homepage(st)
-    common_fuctions.set_page_title(st)
+    common_functions.config_homepage(st)
+    common_functions.set_page_title(st)
 
 
     # Welcome Section with Visual

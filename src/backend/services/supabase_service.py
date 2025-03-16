@@ -10,51 +10,47 @@ from utils import logger
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY') 
 SUPABASE_BUCKET = os.getenv('SUPABASE_BUCKET')
+LLM_MODEL_NAME= os.getenv('LLM_MODEL_NAME')
 
 logger = logger.get_logger()
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def store_chat_history(user_query, bot_response):
-    today = datetime.now().strftime("%Y-%m-%d")
-    file_path = f"{today}/{datetime.now().isoformat()}.json"
-
-    chat_data = {
-        "timestamp": datetime.now().isoformat(),
-        "user_query": user_query,
-        "bot_response": bot_response
-    }
-
+def store_chat_history(conversation_id, new_messages):
     try:
-        # Attempt to download the existing file
+        file_path = f"chat-history/{conversation_id}.json"
+        metadata = {
+            "timestamp": datetime.now().isoformat(),
+            "language": "en",
+            "model": LLM_MODEL_NAME
+        }
+
         try:
             existing_data = supabase.storage.from_(SUPABASE_BUCKET).download(file_path)
-            existing_data = json.loads(existing_data.decode('utf-8')) if existing_data else []
+            chat_data = json.loads(existing_data.decode('utf-8'))
+            chat_data['messages'].extend(new_messages)
+            logger.info("Added the messages to the existing file")
         except Exception:
-            # If file doesn't exist or download fails, start with an empty list
-            existing_data = []
+            chat_data = {
+                "conversation_id": conversation_id,
+                "messages": new_messages,
+                "metadata": metadata
+            }
+            logger.info("Created a new chat history file.")
 
-        # Ensure data is always a list
-        if not isinstance(existing_data, list):
-            existing_data = [existing_data]
+        updated_json_data = json.dumps(chat_data, indent=4)
 
-        # Append new chat data
-        existing_data.append(chat_data)
-        updated_data = json.dumps(existing_data).encode('utf-8')
-
-        # Upload the updated file with 'upsert' option
         supabase.storage.from_(SUPABASE_BUCKET).upload(
-            file_path,
-            updated_data,
-            file_options={"content-type": "application/json"}
+            file_path, updated_json_data.encode('utf-8'),
+            file_options={"content-type": "application/json", "upsert": "true"}
         )
+        logger.info("Chat history stored successfully!")
 
-        logger.info(f"Chat history stored successfully: {file_path}")
-        return {"result": "Successfully stored chat history in the database"}
+        return {"message": "Chat history stored successfully!"}
 
     except Exception as e:
-        logger.error(f"Error storing chat history: {e}")
-        raise
+        logger.error(f"Error: {e}")
+        return {"error": str(e)}
 
 def get_chat_history(date):
     try:
@@ -81,4 +77,12 @@ def create_bucket_with_file():
     except Exception as e:
         print(f"Error creating bucket: {e}")
 
-store_chat_history("hello","Hi friend")
+
+
+conversation_id = "12345"
+messages = [
+    {"role": "system", "content": "Hello Friend."},
+]
+
+
+# store_chat_history(conversation_id,messages)

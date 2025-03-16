@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from chatbot import chatbot_response
-from services import pinecone_service,llm_model_service
-from services.supabase_service import get_chat_history
+from services import llm_model_service
 from utils import logger
-from services.schemas import ChatRequest,ChatResponse,ConversationInput
+from services.schemas import ConversationInput
 
 
 

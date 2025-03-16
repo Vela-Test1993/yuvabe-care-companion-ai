@@ -10,10 +10,9 @@ router = APIRouter(prefix='/chat-db',tags=["Chat History Database API's"])
 @router.post('/store-history')
 def store_chat_history(chat_history : ChatHistoryRequest):
     try:
-        user_input= chat_history.user_query
-        assistant_response = chat_history.assistant_response
-        logger.info(f"Successfully Created file")
-        return supabase_service.store_chat_history(user_input,assistant_response)
+        conversation_id = chat_history.conversation_id
+        messages = chat_history.messages
+        return supabase_service.store_chat_history(conversation_id, messages)
     except Exception as e:
         raise f"Failed to create {e}"
     

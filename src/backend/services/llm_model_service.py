@@ -6,10 +6,9 @@ from utils import logger
 
 logger = logger.get_logger()
 
-
 load_dotenv()
 
-LLM_MODEL_NAME="llama-3.3-70b-versatile"
+LLM_MODEL_NAME=os.environ.get("LLM_MODEL_NAME")
 GROQ_KEY = os.environ.get("GROQ_API")
 client = Groq(api_key=GROQ_KEY)
 

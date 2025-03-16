@@ -1,7 +1,6 @@
 from fastapi import APIRouter,HTTPException
 from data import pinecone_db
 from models.schemas import UpsertRequest,DeleteRequest,MetadataRequest
-from data import pinecone_db
 import pandas as pd
 
 router = APIRouter(prefix="/knowledge-base", tags=['Knowledge Base Operations'])

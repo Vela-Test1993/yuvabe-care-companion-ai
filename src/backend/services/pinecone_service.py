@@ -1,7 +1,7 @@
 import os
-import sys
-src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
-sys.path.append(src_directory)
+# # import sys
+# # src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
+# # sys.path.append(src_directory)
 from pinecone import Pinecone, ServerlessSpec
 import time
 from tqdm import tqdm
@@ -225,11 +225,9 @@ def upsert_vector_data(df: pd.DataFrame):
 
     logger.info("All question-answer pairs stored successfully!")
 
-def retrieve_context_from_pinecone(prompt, n_result=3, score_threshold=0.5):
+def retrieve_context_from_pinecone(embedding, n_result=3, score_threshold=0.5):
 
     index = initialize_pinecone_index(PINECONE,INDEX_NAME)
-    # Generate embedding for the provided prompt
-    embedding = get_text_embedding(prompt)
     # Query Pinecone for relevant context
     response = index.query(
         top_k=n_result,

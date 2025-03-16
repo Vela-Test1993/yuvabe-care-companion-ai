@@ -1,66 +1,124 @@
 import os
+from typing import List, Dict, Optional
 from groq import Groq
 from dotenv import load_dotenv
-from services import pinecone_service
 from utils import logger
 
+# Logger instance
 logger = logger.get_logger()
 
+# Load environment variables
 load_dotenv()
 
-LLM_MODEL_NAME=os.environ.get("LLM_MODEL_NAME")
-GROQ_KEY = os.environ.get("GROQ_API")
-client = Groq(api_key=GROQ_KEY)
+# Configuration constants
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
+GROQ_API_KEY = os.getenv("GROQ_API")
 
-SYSTEM_PROMPT = [
-    {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance strictly on medical, mental health, and wellness topics. You must not respond to questions unrelated to healthcare."},
-    {"role": "system", "content": "Yuvabe Care Companion AI is powered by the LLaMA 3.3-70B Versatile model, optimized for comprehensive and responsible healthcare support."},
-    {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024, but you are NOT a replacement for professional medical advice."},
-    {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses while reminding users to consult healthcare professionals when necessary."},
-    {"role": "system", "content": "If a user asks something unrelated to healthcare, politely decline to answer and remind them that your expertise is limited to healthcare topics."},
-    {"role": "system", "content": "Refer to conversation history to provide context to your response."},
-    {"role": "system", "content":"You are a helpful, friendly, and engaging assistant. Respond with clear explanations, positive language, and a conversational tone. Use emojis to enhance clarity and create a warm interaction. Keep responses concise but informative. If the user seems confused, provide step-by-step guidance."},
-    {"role": "system", "content": "If the user asks questions about technology, entertainment, news, or unrelated topics, respond with: 'I'm here to assist with healthcare-related queries only.'"},
+# Initialize Groq client
+client = Groq(api_key=GROQ_API_KEY)
+
+# System prompt structure s
+SYSTEM_PROMPT: List[Dict[str, str]] = [
+    {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant..."},
+    {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024..."},
+    {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses..."},
+    {"role": "system", "content": "If the user asks non-healthcare questions, politely decline..."},
     {"role": "system", "content": "You were created by Velu R, an AI model developer."}
 ]
 
-def get_health_advice(conversation_history):
+# Constants for token limits and configurations
+MAX_TOKENS = 1024
+MAX_HISTORY_TOKENS = 1000
+DEFAULT_TEMPERATURE = 0.7
+
+def truncate_conversation_history(history: List[Dict[str, str]], max_tokens: int = MAX_HISTORY_TOKENS) -> List[Dict[str, str]]:
     """
-    Generates a health-related response based on relevant context from the vector database.
-    Falls back to LLM's internal knowledge if no relevant context is found.
+    Truncates conversation history to maintain token limits.
+    Retains the most recent interactions if token count exceeds the threshold.
+
+    Args:
+    - history (List[Dict[str, str]]): List of conversation messages
+    - max_tokens (int): Maximum allowable tokens for conversation history
 
     Returns:
-    - str: Assistant's reply containing medical guidance or information.
+    - List[Dict[str, str]]: Truncated conversation history
+    """
+    total_tokens = sum(len(msg["content"]) for msg in history)
+    if total_tokens > max_tokens:
+        logger.warning(f"Conversation history exceeds {max_tokens} tokens. Truncating...")
+        while total_tokens > max_tokens and history:
+            history.pop(0)
+            total_tokens = sum(len(msg["content"]) for msg in history)
+    return history
+
+def build_prompt(
+    user_query: str,
+    db_response: Optional[str],
+    conversation_history: List[Dict[str, str]]
+) -> List[Dict[str, str]]:
+    """
+    Constructs the message prompt for the LLM with system prompts, context, and user queries.
+
+    Args:
+    - user_query (str): The query entered by the user
+    - db_response (Optional[str]): Context retrieved from the vector database
+    - conversation_history (List[Dict[str, str]]): Previous conversation history
+
+    Returns:
+    - List[Dict[str, str]]: Constructed prompt messages
+    """
+    conversation_history = truncate_conversation_history(conversation_history)
+
+    if db_response and "No relevant information found" not in db_response:
+        return SYSTEM_PROMPT + [
+            {"role": "system", "content": f"Relevant Context: {db_response}"},
+            {"role": "user", "content": user_query}
+        ] + conversation_history
+    else:
+        return SYSTEM_PROMPT + [
+            {"role": "system", "content": "Please respond using your internal medical knowledge."},
+            {"role": "user", "content": user_query}
+        ] + conversation_history
+
+def get_health_advice(
+    user_query: str,
+    db_response: Optional[str],
+    conversation_history: List[Dict[str, str]]
+) -> str:
+    """
+    Generates a healthcare-related response using context from the vector database
+    or the LLM's internal knowledge.
+
+    Args:
+    - user_query (str): The user's question or statement
+    - db_response (Optional[str]): Retrieved context for the query
+    - conversation_history (List[Dict[str, str]]): History of the conversation
+
+    Returns:
+    - str: The assistant's response
     """
     try:
-
-        # Step 1: Retrieve context from Pinecone
-        user_query = conversation_history[-1]['content']
-        logger.info(f"Received user query: {user_query}")
-        db_response = pinecone_service.retrieve_context_from_pinecone(user_query)
-        logger.info(f"Fetched DB response: {db_response}")
-
-        # Step 2: Check if context is relevant
-        if db_response and "No relevant information found" not in db_response:
-            # Step 3a: Include relevant context if found
-            messages = SYSTEM_PROMPT + [
-                {"role": "system", "content": f"Relevant Context:{db_response}"},
-                {"role": "user", "content": user_query}
-            ]+conversation_history
-        else:
-            # Step 3b: Use model's internal knowledge if no valid DB response
-            messages = SYSTEM_PROMPT + [
-                {"role": "system", "content": "Please respond using your internal medical knowledge."},
-                {"role": "user", "content": user_query}
-            ] + conversation_history
-
-        # Step 4: Generate response from LLaMA
+        messages = build_prompt(user_query, db_response, conversation_history)
+        
         response = client.chat.completions.create(
             model=LLM_MODEL_NAME,
-            messages=messages
+            messages=messages,
+            max_tokens=MAX_TOKENS,
+            temperature=DEFAULT_TEMPERATURE
         )
 
         assistant_reply = response.choices[0].message.content.strip()
+        logger.info(f"Generated response: {assistant_reply}")
         return assistant_reply
+
+    except (ConnectionError, TimeoutError) as e:
+        logger.error(f"Network error: {e}")
+        return "I'm currently unable to connect to the system. Please try again later."
+
+    except KeyError as e:
+        logger.error(f"Unexpected response structure: {e}")
+        return "I'm sorry, but I couldn't process your request at the moment."
+
     except Exception as e:
+        logger.error(f"Unexpected error occurred: {e}")
         return "I'm sorry, but I'm unable to provide a response right now. Please try again later."

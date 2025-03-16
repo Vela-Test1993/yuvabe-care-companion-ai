@@ -29,12 +29,12 @@ def fetch_health_advice(conversation_history):
 if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = initialize_conversation()
 
-# # Display chat history
-# for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-#     role = message["role"]
-#     avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
-#     with st.chat_message(role, avatar=avatar_image):
-#         st.write(message["content"])
+# Display chat history
+for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+    role = message["role"]
+    avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
+    with st.chat_message(role, avatar=avatar_image):
+        st.write(message["content"])
 
 # User Input
 user_input = st.chat_input("Ask your health-related question:")

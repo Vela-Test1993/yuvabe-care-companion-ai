@@ -92,6 +92,8 @@ def initialize_pinecone_index(pinecone, index_name, dimension=384, metric="cosin
     except Exception as e:
         logger.error(f"Error occurred while getting or creating the Pinecone index: {str(e)}", exc_info=True)
         return None
+
+index = initialize_pinecone_index(PINECONE, INDEX_NAME)
     
 def delete_records_by_ids(ids_to_delete):
     """
@@ -120,22 +122,17 @@ def delete_records_by_ids(ids_to_delete):
         - Deletion occurs within the specified `NAMESPACE`.
     """
     try:
-        index = initialize_pinecone_index(PINECONE,INDEX_NAME)
         index.delete(ids=ids_to_delete, namespace=NAMESPACE)
         logger.info("IDs deleted successfully.")
     except Exception as e:
         return f"Failed to delete the IDs: {e}"
+    
 
-def retrieve_relevant_metadata(prompt, n_result=3, score_threshold=0.47):
+def retrieve_relevant_metadata(embedding, prompt, n_result=3, score_threshold=0.47):
     """
     Retrieves and reranks relevant context data based on a given prompt.
     """
     try:
-        index = initialize_pinecone_index(PINECONE, INDEX_NAME)
-        prompt = prompt[-1] if isinstance(prompt, list) else prompt
-
-        # Generate embedding for the provided prompt
-        embedding = get_text_embedding(prompt)
         response = index.query(
             top_k=n_result,
             vector=embedding,
@@ -149,33 +146,31 @@ def retrieve_relevant_metadata(prompt, n_result=3, score_threshold=0.47):
                 "question": entry.get('metadata', {}).get('question', 'N/A'),
                 "answer": entry.get('metadata', {}).get('answer', 'N/A'),
                 "instruction": entry.get('metadata', {}).get('instruction', 'N/A'),
-                "score": f"{entry.get('score', 0)}",
-                "id": f"{entry.get('id', 'N/A')}"
+                "score": str(entry.get('score', 0)),
+                "id": str(entry.get('id', 'N/A'))
             }
             for entry in response.get('matches', [])
-            if entry.get('score', 0) >= score_threshold
+            if float(entry.get('score', 0)) >= score_threshold
         ]
 
-        # Rerank the filtered results using a reranker model
-        if filtered_results:
-            pairs = [(prompt, item["question"]) for item in filtered_results]
-            scores = reranker.predict(pairs)  # Predict relevance scores
-
-            # Attach reranker scores and sort by relevance
-            for item, score in zip(filtered_results, scores):
-                item["reranker_score"] = score
-
-            filtered_results = sorted(
-                filtered_results, 
-                key=lambda x: x["reranker_score"], 
-                reverse=True
-            )
-
-        # Return metadata or fallback message
+        logger.info(f"Retrieved filtered data: {filtered_results}")
         return filtered_results if filtered_results else [{"response": "No relevant data found."}]
 
+        # # Rerank the filtered results using a reranker model
+        # if filtered_results:
+        #     pairs = [(prompt, item["question"]) for item in filtered_results]
+        #     scores = reranker.predict(pairs)  # Predict relevance scores
+
+        #     # Attach reranker scores and sort by relevance
+        #     for item, score in zip(filtered_results, scores):
+        #         item["reranker_score"] = score
+
+        #     filtered_results.sort(key=lambda x: x["reranker_score"], reverse=True)
+
+        # return filtered_results if filtered_results else [{"response": "No relevant data found."}]
+
     except Exception as e:
-        logger.error(f"Failed to fetch context for '{prompt[:20]}'. Error: {e}")
+        logger.error(f"Failed to fetch context for prompt: '{prompt}'. Error: {e}")
         return [{"response": "Failed to fetch data due to an error."}]
 
 

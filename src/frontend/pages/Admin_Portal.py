@@ -1,38 +1,50 @@
 import streamlit as st
 from app import pinecone_data_handler
+from app import common_functions
 
-# Page Configuration
-# st.set_page_config(page_title="Admin Portal", page_icon="🔒", layout="wide")
+# # Page Configuration
+common_functions.config_homepage()
+common_functions.custom_navbar()
+
 def render_admin_portal():
-    """Renders the Admin Portal page with improved UI and navigation."""
-    
+    """Renders the enhanced Admin Portal page with improved UI and navigation."""
+
     # Header Section
-    st.title("🔒 Admin Portal")
+    st.markdown("<h1 class='header-text'>🛠️ Admin Portal</h1>", unsafe_allow_html=True)
     st.markdown("""
-    ### Welcome to the Admin Portal!
-    Manage your Pinecone data efficiently with the options below.
+        Welcome to the **Admin Portal**.  
+        Manage your Pinecone database with secure and efficient tools.
     """)
+    st.divider()
 
     # Data Manager Tabs
     DataManager = st.tabs(["📂 Pinecone Data Manager"])[0]
 
     with DataManager:
-        Upsert, Delete = st.tabs(["📥 Upsert Data", "🗑️ Delete Records"])
+        Upsert, Delete = st.tabs(["Upsert Data", "Delete Records"])
 
+        # Upsert Section
         with Upsert:
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
             st.markdown("### 📥 Upsert Data")
-            st.info("Use this section to insert or update data in Pinecone.")
+            st.info(
+                "Use this section to **insert** or **update** records in Pinecone."
+                "\n\n✅ Ensure your data is correctly formatted before uploading."
+            )
+            st.markdown("---")
             pinecone_data_handler.upsert_data(st)
+            st.markdown("</div>", unsafe_allow_html=True)
 
+        # Delete Section
         with Delete:
-            st.markdown("### 🗑️ Delete Records")
-            st.warning("Use this section to delete records from Pinecone. Be cautious when performing deletions.")
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            st.markdown("### ⚠️ Delete Records")
+            st.error(
+                "❗ **Warning:** Deleting data is irreversible.\n"
+                "Proceed with caution."
+            )
+            # Confirmation Dialog for Safety
             pinecone_data_handler.delete_records(st)
-
-    # Sidebar for Navigation
-    st.sidebar.title("🔀 Navigation")
-    st.sidebar.markdown("[🏠 Home](http://localhost:8501)", unsafe_allow_html=True)
-    st.sidebar.markdown("[🔒 Knowledge Base](http://localhost:8501/Knowledge_Base_Explorer)", unsafe_allow_html=True)
 
 # Call the function to render the Admin Portal
 if __name__ == "__main__":

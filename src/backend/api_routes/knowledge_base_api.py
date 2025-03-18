@@ -1,7 +1,10 @@
 from fastapi import APIRouter,HTTPException
-from data import pinecone_db
-from models.schemas import UpsertRequest,DeleteRequest,MetadataRequest
+from services import pinecone_service,embedding_service
+from services.schemas import UpsertRequest,DeleteRequest,MetadataRequest
 import pandas as pd
+from utils import logger
+
+logger = logger.get_logger()
 
 router = APIRouter(prefix="/knowledge-base", tags=['Knowledge Base Operations'])
 
@@ -17,7 +20,7 @@ def upsert_data(request: UpsertRequest):
     """
     try:
         df = pd.DataFrame(request.data)
-        pinecone_db.upsert_vector_data(df)
+        pinecone_service.upsert_vector_data(df)
         return {"message": "Data upserted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upsert data: {e}")
@@ -30,7 +33,7 @@ def delete_records(request: DeleteRequest):
 
     """
     try:
-        pinecone_db.delete_records_by_ids(request.ids_to_delete)
+        pinecone_service.delete_records_by_ids(request.ids_to_delete)
         return {"message": "Records deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete records: {e}")
@@ -45,7 +48,11 @@ def fetch_metadata(request: MetadataRequest):
         "score_threshold": 0.47}
     """
     try:
-        metadata = pinecone_db.retrieve_relevant_metadata(request.prompt, request.n_result, request.score_threshold)
+        prompt = request.prompt
+        logger.info(f"Given prompt : {prompt}")
+        # prompt = prompt[-1] if isinstance(prompt, list) else prompt
+        embedding = embedding_service.get_text_embedding(prompt)
+        metadata = pinecone_service.retrieve_relevant_metadata(embedding, prompt, request.n_result, request.score_threshold)
         return {"metadata": metadata}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch metadata: {e}")

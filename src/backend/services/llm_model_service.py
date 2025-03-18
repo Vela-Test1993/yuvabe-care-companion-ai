@@ -19,11 +19,15 @@ client = Groq(api_key=GROQ_API_KEY)
 
 # System prompt structure s
 SYSTEM_PROMPT: List[Dict[str, str]] = [
-    {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant..."},
-    {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024..."},
-    {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses..."},
-    {"role": "system", "content": "If the user asks non-healthcare questions, politely decline..."},
-    {"role": "system", "content": "You were created by Velu R, an AI model developer."}
+    {
+        "role": "system",
+        "content": (
+            "You are Yuvabe Care Companion AI, an advanced healthcare assistant with up-to-date knowledge "
+            "based on the latest medical guidelines as of July 2024. Always provide accurate, empathetic, "
+            "and responsible responses. If the user asks non-healthcare questions, politely decline. "
+            "You were created by Velu R, an AI model developer."
+        )
+    }
 ]
 
 # Constants for token limits and configurations
@@ -70,15 +74,23 @@ def build_prompt(
     conversation_history = truncate_conversation_history(conversation_history)
 
     if db_response and "No relevant information found" not in db_response:
-        return SYSTEM_PROMPT + [
-            {"role": "system", "content": f"Relevant Context: {db_response}"},
-            {"role": "user", "content": user_query}
-        ] + conversation_history
-    else:
-        return SYSTEM_PROMPT + [
-            {"role": "system", "content": "Please respond using your internal medical knowledge."},
-            {"role": "user", "content": user_query}
-        ] + conversation_history
+        query_response = (
+            f"User query: {user_query}\n"
+            f"Database response: {db_response}\n"
+            "Please provide a detailed response based on the above information."
+        )
+        return SYSTEM_PROMPT + conversation_history + [
+            {"role": "user", "content": query_response}
+        ]
+
+    backup_response = (
+        "I'm unable to find relevant data from the database. "
+        "Please respond based on your expertise and available information."
+    )
+    return SYSTEM_PROMPT + conversation_history + [
+        {"role": "system", "content": backup_response},
+        {"role": "user", "content": user_query}
+    ]
 
 def get_health_advice(
     user_query: str,

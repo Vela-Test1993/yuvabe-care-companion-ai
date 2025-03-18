@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 from utils import logger
 import json
 import time
+from datetime import datetime
+from typing import Dict, Any
+import streamlit as st
+
 
 load_dotenv()
 logger = logger.get_logger()
@@ -16,21 +20,23 @@ ABOUT_US = "An AI-powered assistant for personalized healthcare guidance."
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-def config_homepage(st, page_title=PAGE_TITLE):
-    st.set_page_config(
-    page_title=PAGE_TITLE,
-    page_icon= PAGE_ICON,
-    layout=PAGE_LAYOUT,
-    initial_sidebar_state="auto",
-    menu_items={"Get help":GITHUB_LINK,
+def config_homepage(page_title=PAGE_TITLE):
+    if not hasattr(st, "_page_config_set"):
+        st.set_page_config(
+            page_title=PAGE_TITLE,
+            page_icon=PAGE_ICON,
+            layout=PAGE_LAYOUT,
+            initial_sidebar_state="collapsed",
+            menu_items={
+                "Get help": GITHUB_LINK,
                 "Report a bug": GITHUB_LINK,
-                "About": ABOUT_US}
-    )
-    logger.info(f"Page successfully configured with title: {PAGE_TITLE}")
+                "About": ABOUT_US
+            }
+        )
 
-def set_page_title(st, page_title=PAGE_TITLE):
+def set_page_title(page_title=PAGE_TITLE):
     st.markdown(f"""
-        <h1 style="color: darkblue; text-align: left; font-size: 50px;">
+        <h1 style="color: white; text-align: left; font-size: 42px;">
         <i>{PAGE_TITLE} 🏥⚕️🤖</i>
         </h1>
         """, unsafe_allow_html=True
@@ -45,7 +51,7 @@ def img_to_base64(image_path):
         logger.error(f"Error converting image to base64: {str(e)}")
         return None
     
-def typewriter_effect(st, text, speed=0.01):
+def typewriter_effect(text, speed=0.01):
     """Displays text with a realistic typewriter effect (character by character)."""
     placeholder = st.empty()
     displayed_text = ""
@@ -142,30 +148,131 @@ def store_chat_history_in_db(conversation_id, messages):
     except Exception as e:
         logger.info(f"Failed to add the chat in db {e}")
 
-def get_chat_history_from_db(conversation_id):
-    try:
-        API_URL = f"http://127.0.0.1:8000/chat-db/get-history"
-        response = requests.post(API_URL,params={"conversation_id": conversation_id})
-        response.raise_for_status()
-        logger.info(f"Successfully retrieved chat history for conversation ID: {conversation_id}")
-        return response.json()
-    except Exception as e:
-        logger.info(f"Failed to get the chat history")
-    return {"error": "Failed to retrieve chat history. Please try again later."}
+def get_chat_history_from_db(conversation_id: str, retries=3, delay=5):
+    API_URL = "http://127.0.0.1:8000/chat-db/get-history"
+    for attempt in range(retries):
+        try:
+            response = requests.get(API_URL, params={"conversation_id": conversation_id}, timeout=30)
+            response.raise_for_status()
+            return response.json()
+        except ConnectionError:
+            logger.warning(f"Retrying... Attempt {attempt + 1}")
+            time.sleep(delay)
+    raise Exception("Failed to connect after multiple attempts")
 
-def display_chat_history(st):
-    conversation_id = st.session_state.get("conversation_id")
-    if not conversation_id:
-        st.warning("Conversation ID is missing. Please provide a valid ID.")
-        return
+def display_chat_history(st, conversation_id):
+    """
+    Displays the chat history for a given conversation ID in the Streamlit app.
 
+    Args:
+        st (streamlit): Streamlit object for UI rendering.
+        conversation_id (str): Unique identifier for the conversation.
+    """
     try:
         chat_history = get_chat_history_from_db(conversation_id)
-        if chat_history and isinstance(chat_history, dict) and 'error' not in chat_history:
-            st.success("Chat history loaded successfully!")
-            if st.sidebar.button(f"Show History for {conversation_id}",key="show_history_button"):
-                st.json(chat_history)
-        else:
-            st.info("No chat history found for this conversation ID or the data format is incorrect.")
+        button_text = chat_history["messages"][0]['content'].strip()[:20]
+        if st.sidebar.button(f"Show History for {button_text}", key=f"show_history_{button_text}"):
+            st.subheader(f"Chat History for Conversation ID: {conversation_id}")
+            with st.spinner("fetching chat history"):
+                for message in chat_history["messages"]:
+                    st.write(message['role'])
+                    st.write(message['content'])
     except Exception as e:
-        st.error(f"Error retrieving chat history: {e}")
+        logger.error(f"Error retrieving chat history: {e}")
+        st.error("An unexpected error occurred while retrieving chat history.")
+
+    
+def set_bg_image(file_path, opacity=0.5):
+    encoded_img = img_to_base64(file_path)
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: linear-gradient(rgba(0, 0, 0, {opacity}), rgba(0, 0, 0, {opacity})),
+                        url("data:image/png;base64,{encoded_img}") center/cover fixed no-repeat;
+            min-height: 100vh;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+def custom_navbar():
+    st.markdown(
+        """
+        <style>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #F0F2F6; 
+            padding: 4px 24px;
+            margin-top: -30px; 
+            width: 100%; 
+            border-radius: 32px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid #D1D5DB;
+        }
+
+        .logo {
+            font-family: 'Arial', sans-serif;
+            font-size: 30px; /* Slightly larger for better visibility */
+            font-weight: bold;
+            color: #1E293B; /* Darker tone for professional appeal */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px; /* Wider spacing for clarity */
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #1E293B !important; /* Darker color for consistency */
+            background-color: transparent;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px; /* Improved readability */
+            padding: 6px 16px; /* Balanced padding */
+            border-radius: 8px; /* Rounded edges for clickable elements */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effects */
+        }
+
+        .nav-link:hover {
+            background-color: #2E5D5B; /* Distinctive hover effect */
+            color: #FFFFFF; /* White text for contrast */
+        }
+
+        </style>
+
+        <div class="navbar">
+            <div class="logo">Yuvabe Care Companion AI</div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/Admin_Portal" class="nav-link">Admin Portal</a>
+                <a href="/Knowledge_Base_Explorer" class="nav-link">Knowledge Base Explorer</a>
+                <a href="/chatbot" class="nav-link">Chat With Us</a>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def type_text(container, text, delay=0.03):
+    """Simulates a typing effect for text with only text highlighted."""
+    displayed_text = ""
+    for char in text:
+        displayed_text += char
+        container.markdown(f"""
+            <h2 style="
+                color: #3D6D6B;
+                text-align: center;
+                background: linear-gradient(90deg, #3D6D6B, #6EA8A5);
+                -webkit-background-clip: text;
+                color: white;
+                font-weight: bold;
+                font-size: 28px;">
+                {displayed_text}
+            </h2>
+        """, unsafe_allow_html=True)
+        time.sleep(delay)

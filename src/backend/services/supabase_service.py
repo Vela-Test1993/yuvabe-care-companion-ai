@@ -59,7 +59,6 @@ def get_chat_history(conversation_id):
         
         if existing_data:
             chat_data = json.loads(existing_data.decode('utf-8'))
-            logger.info("Chat history retrieved successfully!")
             return chat_data
         else:
             logger.warning("No chat history found for the given conversation ID.")

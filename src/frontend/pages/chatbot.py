@@ -13,8 +13,6 @@ def initialize_conversation():
                          "How can I help you today?")
     
     return [{"role": "assistant", "content": assistant_message}]
-system_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 
-                         "How can I help you today?")
 
 # Function to fetch advice from the API
 def fetch_health_advice(conversation_history):
@@ -28,42 +26,51 @@ def fetch_health_advice(conversation_history):
     except requests.exceptions.RequestException as e:
         st.error(f"API Connection Error: {e}")
         return "I'm currently unable to respond. Please try again later."
+    
+def render_chatbot():
 
-if "conversation_history" not in st.session_state:
-    st.session_state.conversation_history = []
-
-# Display chat history
-for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-    role = message["role"]
-    avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
-    with st.chat_message(role, avatar=avatar_image):
-        st.write(message["content"])
-
-# User Input
-user_input = st.chat_input("Ask your health-related question:")
-with st.chat_message('ai'):
-    common_functions.typewriter_effect(system_message)
-
-if user_input:
+    if "conversation_history" not in st.session_state:
+        st.session_state.conversation_history = []
 
     if 'conversation_id' not in st.session_state:
         st.session_state.conversation_id = datetime.now().strftime("%Y-%m-%d")
 
-    # Display user's input
-    with st.chat_message('user'):
-        common_functions.typewriter_effect(user_input)
+    common_functions.display_chat_history(st.session_state.conversation_id)
+
+    # Display chat history
+    for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+        role = message["role"]
+        avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
+        with st.chat_message(role, avatar=avatar_image):
+            st.write(message["content"])
+
+    # User Input
+    user_input = st.chat_input("Ask your health-related question:")
+    if 'system_message' not in st.session_state:
+        system_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 
+                            "How can I help you today?")
+        st.session_state.system_message = system_message
+        with st.chat_message('ai'):
+            common_functions.typewriter_effect(st.session_state.system_message)
+
+    if user_input:
+
+        # Display user's input
+        with st.chat_message('user'):
+            common_functions.typewriter_effect(user_input)
+            
+        # Append user input to session history
+        st.session_state.conversation_history.append({"role": "user", "content": user_input})
         
-    # Append user input to session history
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
-    
-    # Fetch assistant response
-    assistant_reply = fetch_health_advice(st.session_state.conversation_history)
+        # Fetch assistant response
+        assistant_reply = fetch_health_advice(st.session_state.conversation_history)
 
-    # Append assistant's reply to conversation history first
-    st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
-    common_functions.store_chat_history_in_db(st.session_state.conversation_id,st.session_state.conversation_history)
-    common_functions.display_chat_history(st,st.session_state.conversation_id)
+        # Append assistant's reply to conversation history first
+        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
+        common_functions.store_chat_history_in_db(st.session_state.conversation_id,st.session_state.conversation_history)
 
-    # Display only the assistant's latest response
-    with st.chat_message('assistant'):
-        common_functions.typewriter_effect(assistant_reply)
+        # Display only the assistant's latest response
+        with st.chat_message('assistant'):
+            common_functions.typewriter_effect(assistant_reply)
+
+render_chatbot()

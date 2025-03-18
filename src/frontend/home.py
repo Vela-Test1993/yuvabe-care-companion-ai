@@ -1,13 +1,42 @@
 import streamlit as st
 from app import common_functions
-from pages import Admin_Portal as admin_page
-from pages import Knowledge_Base_Explorer as knowledge_base_explorer_page
-import time
 
 # # Page Configuration
 common_functions.config_homepage()
 common_functions.set_bg_image("src/frontend/images/health_care_baner.png")
 common_functions.custom_navbar()
+st.divider()
+
+def render_homepage():
+# Display the animated text
+    welcome_text = "Welcome to the Yuvabe Care Companion AI!"
+    container = st.empty()
+    common_functions.type_text(container, welcome_text)
+    # Feature Overview Section
+    text = ("""
+        Key Features 
+        - Admin Portal — Effortlessly manage records, track data, and configure settings with ease.
+        - Knowledge Base Explorer — Discover precise and relevant insights using advanced vector search technology.
+        - Patient Assistance — Receive personalized guidance to articulate your health concerns effectively. 
+
+        > 💡 Explore each section to unlock powerful features tailored to enhance your experience.
+        """)
+    
+    st.markdown(f"""
+        <h2 style="
+            text-align: left;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            background-color: #1B3C59; 
+            padding: 10px 20px;
+            border-radius: 8px;
+        ">
+            {text}
+        </h2>
+    """, unsafe_allow_html=True)
+
+render_homepage()
 
 # def render_homepage():
 #     """Renders the Yuvabe Care Companion AI homepage."""
@@ -50,9 +79,3 @@ common_functions.custom_navbar()
 
 # Render the Homepage
 # render_homepage()
-
-
-# Display the animated text
-welcome_text = "👋 Welcome to the Yuvabe Care Companion AI!"
-container = st.empty()
-common_functions.type_text(container, welcome_text)

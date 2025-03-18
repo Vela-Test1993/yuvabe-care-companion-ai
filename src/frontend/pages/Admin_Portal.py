@@ -4,7 +4,6 @@ from app import common_functions
 
 # # Page Configuration
 common_functions.config_homepage()
-common_functions.custom_navbar()
 
 def render_admin_portal():
     """Renders the enhanced Admin Portal page with improved UI and navigation."""

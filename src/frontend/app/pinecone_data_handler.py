@@ -99,8 +99,8 @@ def render_metadata_fetch_form(st):
                     st.subheader("Search Results")
                     for index, entry in enumerate(metadata, start=1):
                         st.markdown(f"### Result {index}")
-                        common_functions.typewriter_effect(st, f"**Question:** {entry.get('question', 'N/A')}")
-                        common_functions.typewriter_effect(st, f"**Answer:** {entry.get('answer', 'N/A')}")
+                        common_functions.typewriter_effect(f"**Question:** {entry.get('question', 'N/A')}")
+                        common_functions.typewriter_effect(f"**Answer:** {entry.get('answer', 'N/A')}")
                         st.markdown(f"**Score:** {entry.get('score', 'N/A')}")
                         st.markdown(f"**ID:** {entry.get('id', 'N/A')}")
                         st.markdown("---")

@@ -160,25 +160,38 @@ def get_chat_history_from_db(conversation_id: str, retries=3, delay=5):
             time.sleep(delay)
     raise Exception("Failed to connect after multiple attempts")
 
-def display_chat_history(st, conversation_id):
+def display_chat_history(conversation_id):
     """
     Displays the chat history for a given conversation ID in the Streamlit app.
 
     Args:
-        st (streamlit): Streamlit object for UI rendering.
         conversation_id (str): Unique identifier for the conversation.
     """
     try:
-        chat_history = get_chat_history_from_db(conversation_id)
-        button_text = chat_history["messages"][0]['content'].strip()[:20]
-        if st.sidebar.button(f"Show History for {button_text}", key=f"show_history_{button_text}"):
-            st.subheader(f"Chat History for Conversation ID: {conversation_id}")
-            with st.spinner("fetching chat history"):
+        with st.spinner("Fetching chat history..."):
+            chat_history = get_chat_history_from_db(conversation_id)
+            
+            if not chat_history or "messages" not in chat_history or not chat_history["messages"]:
+                st.error("No chat history found for this conversation.")
+                return
+
+            first_message_content = chat_history["messages"][0].get('content', '').strip()
+            button_text = first_message_content[:20] if first_message_content else "No Content"
+
+            if st.sidebar.button(f"Show History for {button_text}", key=f"show_history_{conversation_id}"):
+                st.subheader(f"Chat History for Conversation ID: {conversation_id}")
                 for message in chat_history["messages"]:
-                    st.write(message['role'])
-                    st.write(message['content'])
+                    if message['role'] == 'user':
+                        with st.chat_message('user'):
+                            st.write(message['role'])
+                            st.write(message['content'])
+                    elif message['role'] == 'assistant':
+                        with st.chat_message('assistant'):
+                            st.write(message['role'])
+                            st.write(message['content'])
+
     except Exception as e:
-        logger.error(f"Error retrieving chat history: {e}")
+        logger.error(f"Error retrieving chat history for {conversation_id}: {e}")
         st.error("An unexpected error occurred while retrieving chat history.")
 
     
@@ -266,7 +279,7 @@ def type_text(container, text, delay=0.03):
         container.markdown(f"""
             <h2 style="
                 color: #3D6D6B;
-                text-align: center;
+                text-align: left;
                 background: linear-gradient(90deg, #3D6D6B, #6EA8A5);
                 -webkit-background-clip: text;
                 color: white;

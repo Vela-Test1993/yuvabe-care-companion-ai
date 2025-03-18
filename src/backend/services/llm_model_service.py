@@ -74,13 +74,9 @@ def build_prompt(
     conversation_history = truncate_conversation_history(conversation_history)
 
     if db_response and "No relevant information found" not in db_response:
-        query_response = (
-            f"User query: {user_query}\n"
-            f"Database response: {db_response}\n"
-            "Please provide a detailed response based on the above information."
-        )
         return SYSTEM_PROMPT + conversation_history + [
-            {"role": "user", "content": query_response}
+            {"role":"system", "content":f"{db_response}Please provide a detailed response based on the above information.If its relevant to the user query"},
+            {"role": "user", "content": user_query}
         ]
 
     backup_response = (

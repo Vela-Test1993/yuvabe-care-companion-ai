@@ -187,7 +187,6 @@ def upsert_vector_data(df: pd.DataFrame):
     """
 
     try:
-        index = initialize_pinecone_index(PINECONE,INDEX_NAME)
         df["embedding"] = [
             get_text_embedding([q])[0] 
             for q in tqdm(df["input"], desc="Generating Embeddings")
@@ -220,25 +219,51 @@ def upsert_vector_data(df: pd.DataFrame):
 
     logger.info("All question-answer pairs stored successfully!")
 
-def retrieve_context_from_pinecone(embedding, n_result=3, score_threshold=0.5):
+def retrieve_context_from_pinecone(embedding, n_result=3, score_threshold=0.4):
+    """
+    Retrieves relevant context from Pinecone using vector embeddings.
 
-    index = initialize_pinecone_index(PINECONE,INDEX_NAME)
-    # Query Pinecone for relevant context
-    response = index.query(
-        top_k=n_result,
-        vector=embedding,
-        namespace=NAMESPACE,
-        include_metadata=True
-    )
+    Args:
+    - embedding (list): Embedding vector for query.
+    - n_result (int): Number of top results to retrieve.
+    - score_threshold (float): Minimum score threshold for relevance.
 
-    # Extract metadata and filter results
-    filtered_results = [
-        entry['metadata'].get('answer', 'N/A')
-        for entry in response.get('matches', [])
-        if entry.get('score', 0) >= score_threshold
-    ]
+    Returns:
+    - str: Combined context or fallback message.
+    """
+    if not embedding or not isinstance(embedding, list):
+        logger.warning("Invalid embedding received.")
+        return "No relevant context found."
 
-    # Combine the context into a single string
-    context = "\n".join(filtered_results) if filtered_results else "No relevant context found."
-    
-    return context
+    try:
+        response = index.query(
+            top_k=n_result,
+            vector=embedding,
+            namespace=NAMESPACE,
+            include_metadata=True
+        )
+
+        # Validate response structure
+        if 'matches' not in response:
+            logger.error("Unexpected response structure from Pinecone.")
+            return "No relevant context found."
+
+        # Filter and extract metadata
+        filtered_results = []
+        for entry in response.get('matches', []):
+            score = entry.get('score', 0)
+            answer = entry.get('metadata', {}).get('answer', 'N/A')
+
+            if score >= score_threshold:
+                filtered_results.append(f"{answer} (Score: {score:.2f})")
+            else:
+                logger.info(f"Entry skipped due to low score: {score:.2f}")
+
+        # Combine results
+        context = "\n".join(filtered_results) if filtered_results else "No relevant context found."
+        
+        return context
+
+    except Exception as e:
+        logger.error(f"Unexpected error in Pinecone retrieval: {e}", exc_info=True)
+        return "Error retrieving context. Please try again later."

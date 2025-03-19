@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import JSONResponse
-from services import llm_model_service, pinecone_service, embedding_service
+from fastapi import APIRouter, HTTPException, status, Depends
+from services.embedding_service import get_text_embedding
+from services.pinecone_service import retrieve_context_from_pinecone
+from services.llm_model_service import get_health_advice
 from services.schemas import ConversationInput
 from utils import logger
 
@@ -8,15 +9,38 @@ logger = logger.get_logger()
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
-@router.post("/get-health-advice", response_model=dict)
-async def get_health_advice(input_data: ConversationInput):
+@router.post("/get-health-advice", response_model=dict, status_code=status.HTTP_200_OK)
+async def get_health_advice_endpoint(input_data: ConversationInput):
     """
-    Handles requests from the frontend and fetches advice using the `get_health_advice()` function.
+    Provides personalized health advice based on the user's conversation history.
 
-    Args:
-    - input_data (ConversationInput): User's conversation history.
+    ### Overview
+    This endpoint is designed to generate meaningful health advice by leveraging 
+    both the user's most recent query and the conversation history. It ensures 
+    the LLM model is aware of past interactions to maintain context and provide 
+    relevant recommendations.
 
-    Example Input:
+    ### Process Flow
+    1. **Extract User Query:**  
+       - Retrieves the most recent entry from the provided conversation history.  
+       - Ensures the entry is valid and contains a user's question.  
+
+    2. **Generate Query Embedding:**  
+       - Uses the `get_text_embedding` service to generate vector embeddings for the extracted query.  
+
+    3. **Retrieve Contextual Information:**  
+       - Uses the `retrieve_context_from_pinecone` service to fetch relevant context 
+         based on the generated embeddings.  
+
+    4. **Generate Assistant Reply:**  
+       - Passes the extracted query, retrieved context, and full conversation history to the LLM model.  
+       - The LLM utilizes this information to provide a context-aware and personalized response.  
+
+    ### Request Body
+    - **conversation_history** (List[dict]): List of chat entries representing the conversation flow.
+
+    **Example Request:**
+    ```json
     {
         "conversation_history": [
             {"role": "user", "content": "I've been feeling tired lately. What should I do?"},
@@ -24,50 +48,56 @@ async def get_health_advice(input_data: ConversationInput):
             {"role": "user", "content": "No, I just feel drained even after sleeping well."}
         ]
     }
+    ```
 
-    Returns:
-    - dict: Contains 'reply' with the assistant's response.
+    ### Response
+    - **reply** (str): The assistant's response containing tailored health advice.
 
-    Raises:
-    - HTTPException (400): If conversation history or user query is missing.
-    - HTTPException (500): If an internal error occurs during response generation.
+    **Example Response:**
+    ```json
+    {
+        "reply": "You might consider checking your vitamin levels and maintaining a consistent sleep schedule."
+    }
+    ```
+
+    ### Error Handling
+    - **400 Bad Request:** Raised if the conversation history is empty or the latest user query is missing/invalid.  
+    - **500 Internal Server Error:** Raised if an unexpected error occurs while generating the response.  
+
+    ### Notes
+    - Ensure that the conversation history follows a proper role-based structure (`role: "user"` and `role: "assistant"`).  
+    - The LLM's response quality heavily depends on the completeness and relevance of the conversation history.  
+    - The embedding and context retrieval services are essential to enhance the accuracy of the generated advice.  
     """
+
     if not input_data.conversation_history:
         logger.warning("Empty conversation history received.")
-        raise HTTPException(status_code=400, detail="Conversation history cannot be empty.")
-
-    try:
-        last_entry = input_data.conversation_history[-1]
-        if not isinstance(last_entry, dict) or last_entry.get("role") != "user":
-            logger.warning("Invalid conversation entry format or missing user query.")
-            raise HTTPException(status_code=400, detail="Invalid conversation entry or missing user query.")
-
-        user_query = last_entry.get("content")
-        if not user_query:
-            logger.warning("User query content is missing in the conversation history.")
-            raise HTTPException(status_code=400, detail="User query content cannot be empty.")
-
-        logger.info(f"Received user query: {user_query}")
-        query_embeddings = embedding_service.get_text_embedding(user_query)
-
-        db_response = pinecone_service.retrieve_context_from_pinecone(query_embeddings)
-        logger.info("Fetched DB response successfully.")
-
-        assistant_reply = llm_model_service.get_health_advice(
-            user_query, db_response, input_data.conversation_history
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Conversation history cannot be empty."
         )
 
-        if not assistant_reply:
-            logger.warning("Assistant generated an empty response.")
-            raise HTTPException(status_code=500, detail="Assistant generated an empty response.")
+    last_entry = input_data.conversation_history[-1]
+    user_query = last_entry.get("content")
 
-        logger.info("Health advice generated successfully.")
-        return JSONResponse(content={"reply": assistant_reply}, status_code=200)
+    if last_entry.get("role") != "user" or not user_query:
+        logger.warning("Invalid or missing user query in conversation history.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or missing user query."
+        )
 
-    except HTTPException as http_exc:
-        logger.error(f"HTTPException occurred: {http_exc.detail}")
-        raise http_exc
+    try:
+        query_embeddings = get_text_embedding(user_query)
+        db_response = retrieve_context_from_pinecone(query_embeddings)
+        assistant_reply = get_health_advice(
+            user_query, db_response, input_data.conversation_history
+        )
+        return {"reply": assistant_reply}
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error generating response. Please try again later.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error generating response. Please try again later."
+        )

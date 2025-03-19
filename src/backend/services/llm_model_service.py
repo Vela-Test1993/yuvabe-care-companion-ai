@@ -73,15 +73,17 @@ def build_prompt(
     """
     conversation_history = truncate_conversation_history(conversation_history)
 
-    if db_response and "No relevant information found" not in db_response:
+    if db_response and db_response.strip() and "No relevant information found" not in db_response:
         return SYSTEM_PROMPT + conversation_history + [
-            {"role":"system", "content":f"{db_response}Please provide a detailed response based on the above information.If its relevant to the user query"},
+            {"role": "system", "content": (f"Here is some context from the database: {db_response}. "
+                                               "If this information is relevant to the user's query, please use it to form your response. "
+                                               "Otherwise, rely on your own knowledge and expertise.")},
             {"role": "user", "content": user_query}
         ]
 
     backup_response = (
-        "I'm unable to find relevant data from the database. "
-        "Please respond based on your expertise and available information."
+        "I couldn't find specific data from the database. "
+        "Please provide a detailed response based on your expertise and available information."
     )
     return SYSTEM_PROMPT + conversation_history + [
         {"role": "system", "content": backup_response},
@@ -116,7 +118,6 @@ def get_health_advice(
         )
 
         assistant_reply = response.choices[0].message.content.strip()
-        logger.info(f"Generated response: {assistant_reply}")
         return assistant_reply
 
     except (ConnectionError, TimeoutError) as e:

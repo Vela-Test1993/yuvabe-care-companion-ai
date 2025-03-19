@@ -37,7 +37,7 @@ def config_homepage(page_title=PAGE_TITLE):
 def set_page_title(page_title=PAGE_TITLE):
     st.markdown(f"""
         <h1 style="color: white; text-align: left; font-size: 42px;">
-        <i>{PAGE_TITLE} 🏥⚕️🤖</i>
+        <i>{PAGE_TITLE} ⚕️</i>
         </h1>
         """, unsafe_allow_html=True
     )
@@ -141,7 +141,7 @@ def fetch_response(prompt, chat_history):
     
 def store_chat_history_in_db(conversation_id, messages):
     try:
-        API_URL = f"http://localhost:8000/chat-db/store-history"
+        API_URL = f"http://localhost:8000/chat-history/store"
         payload = {"conversation_id": conversation_id, 'messages': messages}
         response = requests.post(API_URL, json=payload)
         logger.info("Successfully added the chat in db")
@@ -149,7 +149,7 @@ def store_chat_history_in_db(conversation_id, messages):
         logger.info(f"Failed to add the chat in db {e}")
 
 def get_chat_history_from_db(conversation_id: str, retries=3, delay=5):
-    API_URL = "http://127.0.0.1:8000/chat-db/get-history"
+    API_URL = "http://127.0.0.1:8000/chat-history/retrieve"
     for attempt in range(retries):
         try:
             response = requests.get(API_URL, params={"conversation_id": conversation_id}, timeout=30)
@@ -171,24 +171,35 @@ def display_chat_history(conversation_id):
         with st.spinner("Fetching chat history..."):
             chat_history = get_chat_history_from_db(conversation_id)
             
-            if not chat_history or "messages" not in chat_history or not chat_history["messages"]:
+            if not chat_history or "data" not in chat_history or not chat_history["data"].get("messages"):
                 st.error("No chat history found for this conversation.")
                 return
-
-            first_message_content = chat_history["messages"][0].get('content', '').strip()
+            
+            first_message_content = chat_history["data"]["messages"][0].get('content', '').strip()
             button_text = first_message_content[:20] if first_message_content else "No Content"
 
             if st.sidebar.button(f"Show History for {button_text}", key=f"show_history_{conversation_id}"):
                 st.subheader(f"Chat History for Conversation ID: {conversation_id}")
-                for message in chat_history["messages"]:
-                    if message['role'] == 'user':
-                        with st.chat_message('user'):
-                            st.write(message['role'])
-                            st.write(message['content'])
-                    elif message['role'] == 'assistant':
-                        with st.chat_message('assistant'):
-                            st.write(message['role'])
-                            st.write(message['content'])
+
+                for message in chat_history["data"]["messages"]:
+                    role = message.get('role', '').capitalize()
+                    content = message.get('content', '').strip()
+
+                    if role == 'User':
+                        st.markdown(f"**{role}:** {content}")
+                    elif role == 'Assistant':
+                        st.markdown(f"""
+                                    <div style="
+                                        background-color: #f0f2f6; 
+                                        padding: 15px; 
+                                        border-left: 5px solid #4CAF50; 
+                                        border-radius: 8px; 
+                                        margin-bottom: 10px;
+                                        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);">
+                                        <strong style="color: #333; font-size: 16px;">{role}:</strong>
+                                        <div style="margin-top: 5px; color: #555; font-size: 14px;">{content}</div>
+                                    </div>
+                                """, unsafe_allow_html=True)
 
     except Exception as e:
         logger.error(f"Error retrieving chat history for {conversation_id}: {e}")

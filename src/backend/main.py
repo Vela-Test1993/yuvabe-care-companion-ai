@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from api_routes.chat_api import router as chat_router
 from api_routes.knowledge_base_api import router as knowledge_base_router
-from api_routes.chat_history_db_api import router as chat_history_router
+from api_routes.chat_history_supabase_api import router as chat_history_router
 
 description = (
     "Yuvabe Care Companion AI is designed to provide helpful and accurate "

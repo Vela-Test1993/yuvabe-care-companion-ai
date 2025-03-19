@@ -92,7 +92,7 @@ def initialize_pinecone_index(pinecone, index_name, dimension=384, metric="cosin
     except Exception as e:
         logger.error(f"Error occurred while getting or creating the Pinecone index: {str(e)}", exc_info=True)
         return None
-
+    
 index = initialize_pinecone_index(PINECONE, INDEX_NAME)
     
 def delete_records_by_ids(ids_to_delete):

@@ -7,6 +7,7 @@ API_URL = "http://localhost:8000/chat/get-health-advice/"
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 common_functions.config_homepage()
 common_functions.set_page_title()
+common_functions.set_bg_image("src/frontend/images/health_care_baner_3.gif")
 # Initialize conversation history
 def initialize_conversation():
     assistant_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 

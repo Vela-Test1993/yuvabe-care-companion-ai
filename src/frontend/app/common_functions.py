@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 from utils import logger
 import json
 import time
-from datetime import datetime
-from typing import Dict, Any
 import streamlit as st
 
 
@@ -85,43 +83,10 @@ def upsert_data_request(start, end):
         response = requests.post(url, data=json.dumps(payload), headers=headers)
         return response.json()
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        logger.info(f"HTTP error occurred: {http_err}")
     except Exception as err:
-        print(f"An error occurred: {err}")
+        logger.info(f"An error occurred: {err}")
     
-# def initialize_conversation():
-#     """
-#     Initialize the conversation history with system and assistant messages.
-
-#     Returns:
-#     - list: Initialized conversation history.
-#     """
-#     assistant_message = (
-#         "Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. "
-#         "I can provide information about common symptoms, medications, treatments, and wellness tips. "
-#         "How can I help you today?"
-#     )
-
-#     conversation_history = [
-#         {"role": "system", "content": "You are Yuvabe Care Companion AI, an advanced healthcare assistant designed to provide guidance on medical, mental health, and wellness topics."},
-#         {"role": "system", "content": "Yuvabe Care Companion AI is powered by the LLaMA 3.3-70B Versatile model, optimized for comprehensive and responsible healthcare support."},
-#         {"role": "system", "content": "Your knowledge is up-to-date with the latest medical guidelines as of July 2024, but you are NOT a replacement for professional medical advice."},
-#         {"role": "system", "content": "Always provide accurate, empathetic, and responsible responses while reminding users to consult healthcare professionals when necessary."},
-#         {"role": "system", "content": "You were created by Velu R, an AI model developer."},
-#         {"role": "assistant", "content": assistant_message}
-#     ]
-#     return conversation_history
-
-
-
-
-
-
-
-
-
-
-
 def fetch_response(prompt, chat_history):
     try:
         # Prepare data for API request
@@ -230,41 +195,65 @@ def custom_navbar():
             justify-content: space-between;
             align-items: center;
             background-color: #F0F2F6; 
-            padding: 4px 24px;
+            padding: 12px 32px;
             margin-top: -30px; 
             width: 100%; 
+            max-width: 1200px;
             border-radius: 32px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             border: 1px solid #D1D5DB;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+            flex-wrap: wrap;
         }
 
         .logo {
             font-family: 'Arial', sans-serif;
-            font-size: 30px; /* Slightly larger for better visibility */
+            font-size: 30px;
             font-weight: bold;
-            color: #1E293B; /* Darker tone for professional appeal */
+            color: #1E293B;
+            white-space: nowrap; 
+            text-overflow: ellipsis;
+            flex-wrap: wrap;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px; /* Wider spacing for clarity */
+            gap: 32px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .nav-link {
-            color: #1E293B !important; /* Darker color for consistency */
+            color: #1E293B !important;
             background-color: transparent;
             text-decoration: none;
             font-weight: 600;
-            font-size: 18px; /* Improved readability */
-            padding: 6px 16px; /* Balanced padding */
-            border-radius: 8px; /* Rounded edges for clickable elements */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effects */
+            font-size: 18px;
+            padding: 6px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
         }
 
         .nav-link:hover {
-            background-color: #2E5D5B; /* Distinctive hover effect */
-            color: #FFFFFF; /* White text for contrast */
+            background-color: #2E5D5B;
+            color: #FFFFFF;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+                padding: 12px 16px; /* Adjusted padding for smaller screens */
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 8px;
+            }
         }
 
         </style>

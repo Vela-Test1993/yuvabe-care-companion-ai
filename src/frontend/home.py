@@ -15,9 +15,12 @@ def render_homepage():
     # Feature Overview Section
     text = ("""
         Key Features 
+            
         - Admin Portal — Effortlessly manage records, track data, and configure settings with ease.
+            
         - Knowledge Base Explorer — Discover precise and relevant insights using advanced vector search technology.
-        - Patient Assistance — Receive personalized guidance to articulate your health concerns effectively. 
+            
+        - Chat with Us — Engage with our intelligent assistant for personalized guidance, helping you articulate your health concerns with clarity and confidence. 
 
         > 💡 Explore each section to unlock powerful features tailored to enhance your experience.
         """)

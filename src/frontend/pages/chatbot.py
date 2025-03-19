@@ -7,7 +7,7 @@ API_URL = "http://localhost:8000/chat/get-health-advice/"
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 common_functions.config_homepage()
 common_functions.set_page_title()
-common_functions.set_bg_image("src/frontend/images/health_care_baner_3.gif")
+common_functions.set_bg_image("src/frontend/images/health_care_baner_2.jpg")
 # Initialize conversation history
 def initialize_conversation():
     assistant_message = ("Hello! I am your Yuvabe Care Companion AI, here to assist you with general medicine queries. " 
@@ -41,7 +41,7 @@ def render_chatbot():
     # Display chat history
     for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
         role = message["role"]
-        avatar_image = "src/frontend/images/page_icon.jpg" if role == "assistant" else "src/frontend/images/page_icon.jpg" if role == "user" else None
+        avatar_image = "src/frontend/images/chat_doctor_logo.png" if role == "assistant" else "src/frontend/images/healthy.png" if role == "user" else None
         with st.chat_message(role, avatar=avatar_image):
             st.write(message["content"])
 
@@ -57,7 +57,8 @@ def render_chatbot():
     if user_input:
 
         # Display user's input
-        with st.chat_message('user'):
+        user_avatar_image = "src/frontend/images/healthy.png"
+        with st.chat_message('user',avatar=user_avatar_image):
             common_functions.typewriter_effect(user_input)
             
         # Append user input to session history
@@ -71,7 +72,8 @@ def render_chatbot():
         common_functions.store_chat_history_in_db(st.session_state.conversation_id,st.session_state.conversation_history)
 
         # Display only the assistant's latest response
-        with st.chat_message('assistant'):
+        doctor_avatar_image = "src/frontend/images/chat_doctor_logo.png"
+        with st.chat_message('assistant',avatar=doctor_avatar_image):
             common_functions.typewriter_effect(assistant_reply)
 
 render_chatbot()

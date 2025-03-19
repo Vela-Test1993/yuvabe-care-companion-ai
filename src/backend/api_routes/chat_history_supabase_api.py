@@ -66,7 +66,6 @@ def get_chat_history(
     """
     try:
         chat_history = supabase_service.retrieve_chat_history(conversation_id)
-        logger.info(f"Retrieved history: {chat_history}")
 
         if not chat_history.get('success'):
             error_message = chat_history.get('error', "Unknown error occurred.")
@@ -76,7 +75,6 @@ def get_chat_history(
                 detail=f"Chat history not found for ID: {conversation_id}"
             )
 
-        logger.info(f"Chat history retrieved successfully for ID: {conversation_id}")
         return chat_history
 
     except KeyError as key_error:

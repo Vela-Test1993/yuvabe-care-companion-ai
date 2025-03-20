@@ -2,7 +2,7 @@ import os
 from typing import List, Dict, Optional
 from groq import Groq
 from dotenv import load_dotenv
-from utils import logger
+from backend.utils import logger
 
 # Logger instance
 logger = logger.get_logger()

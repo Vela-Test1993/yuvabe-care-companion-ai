@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import string
-from utils import logger
+from backend.utils import logger
 
 logger = logger.get_logger()
 

@@ -1,67 +1,125 @@
 import requests
-from app import common_functions
+from frontend.app import common_functions
 import streamlit as st
-
 
 API_BASE_URL = "http://localhost:8000/knowledge-base"
 
-def upsert_data(st):
-    st.header("Upsert Data")
+def upsert_data():
+    """
+    Displays a form to upsert data into the Pinecone database.
+
+    Features:
+    - Users can provide 'Input', 'Output', and 'Instruction'.
+    - Displays appropriate success or error messages.
+    - Improved error handling with detailed feedback.
+    """
+
+    st.subheader("Enter the data to upsert")
     with st.form("upsert_form"):
-        input_text = st.text_area("Input", "What is mental health?")
-        output_text = st.text_area("Output", "Mental health refers to...")
-        instruction_text = st.text_input("Instruction", "Focus on general well-being.")
-        upsert_submit = st.form_submit_button("Upsert Data")
+        # Input Fields
+        input_text = st.text_area("Input", placeholder="Enter input text here...", height=150)
+        output_text = st.text_area("Output", placeholder="Enter output text here...", height=150)
+        instruction_text = st.text_input("Instruction", placeholder="Provide guidance for the data...")
+
+        upsert_submit = st.form_submit_button("🚀 Upsert Data")
 
         if upsert_submit:
-            payload = {"data": [{"input": input_text, "output": output_text, "instruction": instruction_text}]}
-            response = requests.post(f"{API_BASE_URL}/upsert-data", json=payload)
-            st.success(response.json()["message"]) if response.status_code == 200 else st.error(response.json()["detail"])
+            # ✅ Validation Check
+            if not input_text.strip() or not output_text.strip() or not instruction_text.strip():
+                st.error("❗ All fields are required. Please fill out each section before submitting.")
+                return
 
-def delete_records(st):
-    st.header("Delete Records")
+            # ✅ Payload Creation
+            payload = {
+                "data": [
+                    {
+                        "input": input_text.strip(),
+                        "output": output_text.strip(),
+                        "instruction": instruction_text.strip()
+                    }
+                ]
+            }
+
+            # API Call 
+            with st.spinner("⏳ Processing your data..."):
+                try:
+                    response = requests.post(f"{API_BASE_URL}/upsert-data", json=payload)
+                    response_data = response.json()
+
+                    if response.status_code == 200:
+                        st.success(f"✅ Data successfully upserted: {response_data.get('message', 'Success')}")
+                        st.toast("🎉 Upsert successful!")
+                    elif response.status_code == 400:
+                        st.warning(f"⚠️ Bad Request: {response_data.get('detail', 'Check your input data.')}")
+                    elif response.status_code == 500:
+                        st.error("❌ Internal Server Error. Please try again later.")
+                    else:
+                        st.error(f"❗ Unexpected error: {response_data.get('detail', 'Unknown issue occurred.')}")
+                except requests.exceptions.RequestException as e:
+                    st.error(f"❌ Network error: {e}")
+
+def delete_records():
+    """
+    Displays a form to delete records from the Pinecone database.
+
+    Features:
+    - Users can input comma-separated IDs for deletion.
+    - Includes validation checks for empty or malformed IDs.
+    - Enhanced error handling for better user feedback.
+    """
+    st.subheader("Enter id to delete")
     with st.form("delete_form"):
-        ids_to_delete = st.text_area("IDs to Delete", "id_123, id_456").split(",")
-        delete_submit = st.form_submit_button("Delete Records")
+        ids_input = st.text_area("IDs to Delete", placeholder="Enter IDs separated by commas (e.g., id_123, id_456)")
+        ids_to_delete = [id.strip() for id in ids_input.split(",") if id.strip()]
+
+        delete_submit = st.form_submit_button("🗑️ Delete Records")
 
         if delete_submit:
-            payload = {"ids_to_delete": [id.strip() for id in ids_to_delete]}
-            response = requests.post(f"{API_BASE_URL}/delete-records", json=payload)
-            st.success(response.json()["message"]) if response.status_code == 200 else st.error(response.json()["detail"])
+            # ✅ Validation Check
+            if not ids_to_delete:
+                st.error("❗ Please provide at least one valid ID.")
+                return
 
-# def render_metadata_fetch_form(st):
-#     st.header("Fetch Metadata")
-#     with st.form("fetch_metadata_form"):
-#         prompt_text = st.text_area("Describe Your Concern", "e.g., I've been feeling anxious lately.")
-#         n_result = st.number_input("Number of Results", min_value=1, value=3)
-#         score_threshold = st.number_input("Score Threshold", min_value=0.0, max_value=1.0, value=0.47)
-#         metadata_submit = st.form_submit_button("Fetch Metadata")
+            # 🔒 Confirmation Prompt for Safety
+            if not st.confirm("Are you sure you want to delete the selected records? This action is irreversible."):
+                st.info("❗ Deletion canceled.")
+                return
 
-#         if metadata_submit:
-#             payload = {
-#                 "prompt": prompt_text,
-#                 "n_result": n_result,
-#                 "score_threshold": score_threshold
-#             }
-#             response = requests.post(f"{API_BASE_URL}/fetch-metadata", json=payload)
-#             if response.status_code == 200:
-#                 metadata = response.json().get('metadata', [])
-#                 try:
-#                     if metadata:
-#                         st.subheader("Search Results")
-#                         for index, entry in enumerate(metadata, start=1):
-#                             st.markdown(f"### Result {index}")
-#                             common_fuctions.typewriter_effect(st, f"**Question:** {entry['question']}")
-#                             common_fuctions.typewriter_effect(st, f"**Answer:** {entry['answer']}")
-#                             st.markdown(f"**Score:** {entry['score']}")
-#                             st.markdown(f"**ID:** {entry['id']}")
-#                             st.markdown("---")
-#                 except Exception as e:
-#                     st.info("There is not relevant data to fetch")
+            # ✅ Payload Creation
+            payload = {"ids_to_delete": ids_to_delete}
 
-def render_metadata_fetch_form(st):
-    st.header("Fetch Metadata")
+            # ✅ API Call with Improved Error Handling
+            with st.spinner("⏳ Deleting records..."):
+                try:
+                    response = requests.post(f"{API_BASE_URL}/delete-records", json=payload)
+                    response_data = response.json()
+
+                    if response.status_code == 200:
+                        st.success(f"✅ {response_data.get('message', 'Records successfully deleted.')}")
+                        st.toast("🎯 Deletion successful!")
+                    elif response.status_code == 400:
+                        st.warning(f"⚠️ Bad Request: {response_data.get('detail', 'Check the provided IDs.')}")
+                    elif response.status_code == 404:
+                        st.warning("⚠️ No matching records found. Please verify the provided IDs.")
+                    elif response.status_code == 500:
+                        st.error("❌ Internal Server Error. Please try again later.")
+                    else:
+                        st.error(f"❗ Unexpected error: {response_data.get('detail', 'Unknown issue occurred.')}")
+                except requests.exceptions.RequestException as e:
+                    st.error(f"❌ Network error: {e}")
+
+def render_metadata_fetch_form():
+    """
+    Renders a form to fetch metadata based on user concerns.
+    
+    Features:
+    - Input validation to ensure meaningful data is provided.
+    - Displays metadata in a visually appealing format.
+    - Improved error handling with detailed messages.
+    """
+    st.header("📋 Fetch Metadata")
     with st.form("fetch_metadata_form"):
+        # 📝 Input Fields
         prompt_text = st.text_area(
             "Describe Your Concern", 
             "e.g., I've been feeling anxious lately.",
@@ -81,30 +139,47 @@ def render_metadata_fetch_form(st):
             help="Set the minimum relevance score for the results. Higher values ensure more accurate matches."
         )
 
-        metadata_submit = st.form_submit_button("Fetch Metadata")
+        metadata_submit = st.form_submit_button("🔍 Fetch Metadata")
 
         if metadata_submit:
+            # ✅ Input Validation
+            if not prompt_text.strip():
+                st.warning("❗ Please provide a valid concern description.")
+                return
+
             payload = {
                 "prompt": prompt_text.strip(),
                 "n_result": n_result,
                 "score_threshold": score_threshold
             }
 
-            try:
-                response = requests.post(f"{API_BASE_URL}/fetch-metadata", json=payload)
-                response.raise_for_status()  # Ensures HTTP errors are caught
-                metadata = response.json().get('metadata', [])
+            # 🔄 Enhanced API Request with Better Error Handling
+            with st.spinner("⏳ Fetching metadata..."):
+                try:
+                    response = requests.post(f"{API_BASE_URL}/fetch-metadata", json=payload)
+                    response.raise_for_status()  
+                    metadata = response.json().get('metadata', [])
 
-                if metadata:
-                    st.subheader("Search Results")
-                    for index, entry in enumerate(metadata, start=1):
-                        st.markdown(f"### Result {index}")
-                        common_functions.typewriter_effect(f"**Question:** {entry.get('question', 'N/A')}")
-                        common_functions.typewriter_effect(f"**Answer:** {entry.get('answer', 'N/A')}")
-                        st.markdown(f"**Score:** {entry.get('score', 'N/A')}")
-                        st.markdown(f"**ID:** {entry.get('id', 'N/A')}")
-                        st.markdown("---")
-                else:
-                    st.info("No relevant data found based on your input. Try refining your concern or adjusting the threshold.")
-            except Exception as e:
-                st.error(f"An unexpected error occurred: {e}")
+                    # ✅ Display Results
+                    if metadata:
+                        st.success(f"✅ Found {len(metadata)} relevant result(s).")
+                        st.subheader("Search Results")
+
+                        for index, entry in enumerate(metadata, start=1):
+                            common_functions.typewriter_effect(f"**🧠 Question:** {entry.get('question', 'N/A')}",speed=0)
+                            common_functions.typewriter_effect(f"**💬 Answer:** {entry.get('answer', 'N/A')}",speed=0)
+                            st.markdown(f"**📈 Score:** `{entry.get('score', 'N/A')}`")
+                            st.markdown(f"**🆔 ID:** `{entry.get('id', 'N/A')}`")
+
+                    else:
+                        st.info("🤔 No relevant data found. Try refining your concern or adjusting the score threshold.")
+
+                # Exception Handling for Specific Errors
+                except requests.exceptions.HTTPError as http_err:
+                    st.error(f"❌ HTTP Error: {http_err}")
+                except requests.exceptions.ConnectionError:
+                    st.error("❌ Network error. Please check your internet connection.")
+                except requests.exceptions.Timeout:
+                    st.error("❌ Request timed out. Please try again later.")
+                except requests.exceptions.RequestException as e:
+                    st.error(f"❌ Unexpected error: {e}")

@@ -1,8 +1,8 @@
-from typing import Dict, Any, Union
+from typing import Dict,List, Any, Union
 from fastapi import APIRouter, HTTPException, status, Query
-from services.schemas import ChatHistoryRequest
-from services import supabase_service
-from utils import logger
+from backend.services.schemas import ChatHistoryRequest
+from backend.services import supabase_service
+from backend.utils import logger
 
 logger = logger.get_logger()
 
@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post('/store', response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
-def add_chat_history(chat_history: ChatHistoryRequest) -> Dict[str, Any]:
+async def add_chat_history(chat_history: ChatHistoryRequest) -> Dict[str, Any]:
     """
     Save chat conversation history in the database.
 
@@ -50,7 +50,7 @@ def add_chat_history(chat_history: ChatHistoryRequest) -> Dict[str, Any]:
         )
 
 @router.get('/retrieve', response_model=Union[Dict[str, Any], None])
-def get_chat_history(
+async def get_chat_history(
     conversation_id: str = Query(..., description="Conversation ID for chat history retrieval")
 ) -> Union[Dict[str, Any], None]:
     """
@@ -97,3 +97,23 @@ def get_chat_history(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred while retrieving chat history. Please try again later."
         )
+
+@router.get("/bucket-items", response_model=List[str])
+async def retrieve_bucket_items():
+    """
+    API endpoint to retrieve item names from a specified Supabase storage bucket.
+
+    Returns:
+        List[str]: A list of item names with '.json' removed, excluding the last item in the bucket.
+
+    Raises:
+        HTTPException: If an error occurs while fetching bucket items.
+    """
+    try:
+        conversation_ids = supabase_service.get_bucket_items()
+        if conversation_ids:
+            return conversation_ids
+        else:
+            raise HTTPException(status_code=404, detail="No items found in the bucket.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching bucket items: {e}")

@@ -1,84 +1,77 @@
 import streamlit as st
-from app import common_functions
+from frontend.app import common_functions
 
-# # Page Configuration
+WELCOME_TEXT = "Welcome to the Yuvabe Care Companion AI!"   
+
+# Page Configuration
 common_functions.config_homepage()
 common_functions.set_bg_image("src/frontend/images/health_care_baner.png")
 common_functions.custom_navbar()
 st.divider()
 
 def render_homepage():
-# Display the animated text
-    welcome_text = "Welcome to the Yuvabe Care Companion AI!"
-    container = st.empty()
-    common_functions.type_text(container, welcome_text)
-    # Feature Overview Section
-    text = ("""
-        Key Features 
-            
-        - Admin Portal — Effortlessly manage records, track data, and configure settings with ease.
-            
-        - Knowledge Base Explorer — Discover precise and relevant insights using advanced vector search technology.
-            
-        - Chat with Us — Engage with our intelligent assistant for personalized guidance, helping you articulate your health concerns with clarity and confidence. 
+    """
+    Renders the Yuvabe Care Companion AI homepage with improved visuals and enhanced user experience.
 
-        > 💡 Explore each section to unlock powerful features tailored to enhance your experience.
-        """)
+    Features:
+    - Displays a warm welcome message with animated text.
+    - Highlights key features using clean and modern UI design.
+    - Encourages user engagement with a prominent 'Get Started' call-to-action.
+
+    Visual Enhancements:
+    - Consistent color theme with improved contrast for readability.
+    - Box shadows and rounded corners for a modern touch.
+    - Organized content using bullet points, ensuring clarity and focus.
+
+    """
     
-    st.markdown(f"""
-        <h2 style="
-            text-align: left;
-            font-weight: bold;
-            font-size: 18px;
-            color: white;
-            background-color: #1B3C59; 
-            padding: 10px 20px;
-            border-radius: 8px;
+    # Welcome Text with Animation
+    common_functions.typewriter_effect(WELCOME_TEXT, speed=0.02, gradient=True)
+    
+    # Key Features Section
+    st.markdown(
+        """
+        <div style="
+            background-color: #1B3C59;
+            color: #FFFFFF;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            margin-top: 20px;
         ">
-            {text}
-        </h2>
-    """, unsafe_allow_html=True)
+            <h2 style="text-align: left; font-weight: bold;">Key Features</h2>
+            <ul style="padding-left: 20px;">
+                <li><b>🛠️ Admin Portal</b> — Effortlessly manage records, track data, and configure settings with ease.</li>
+                <li><b>📚 Knowledge Base Explorer</b> — Discover precise and relevant insights using advanced vector search technology.</li>
+                <li><b>💬 Chat with Us</b> — Engage with our intelligent assistant for personalized guidance.</li>
+            </ul>
+            <p style="margin-top: 15px; font-style: italic; font-weight: bold;">
+                💡 Explore each section to unlock powerful features tailored to enhance your experience.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+   # Call-to-Action Section
+    st.markdown(
+        """
+        <div style="
+            text-align: center;
+            margin-top: 30px;
+            padding: 18px 35px;
+            background-color: #4CAF50;
+            color: #FFFFFF;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        ">
+            🌿 Ready to Get Started? Begin Your Journey Now! 🚀
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-render_homepage()
-
-# def render_homepage():
-#     """Renders the Yuvabe Care Companion AI homepage."""
-
-    # # Welcome Section with Visual
-    # st.image("src/frontend/images/health_care_baner.png", 
-    #          use_container_width=True, 
-    #          caption="Your AI-Powered Health Companion")
-
-    # # Navigation Tabs
-    # Home, Admin_Portal, Knowledge_Base_Explorer = st.tabs(
-    #     ["🏠 Home", "🔒 Admin Portal", "📚 Knowledge Base Explorer"]
-    # )
-
-    # with Home:
-    # st.markdown("""
-    # ### 👋 Welcome to the Yuvabe Care Companion AI!
-    # This platform offers comprehensive tools to support your healthcare journey. Use the tabs above to navigate:
-    # """)
-
-    # # Feature Overview Section
-    # st.markdown("""
-    # ### 🔹 Key Features
-    # - **Admin Portal** — Manage records, data, and configurations efficiently.
-    # - **Knowledge Base Explorer** — Leverage advanced vector search to find relevant knowledge entries with precision.
-    # - **Patient Assistance** — Personalized guidance to help patients describe their concerns.
-
-    # > 💡 *Explore each section for detailed functionality.*
-    # """)
-
-    # with Admin_Portal:
-    #     admin_page.render_admin_portal()
-    #     # if st.button("Go to Admin Portal"):
-    #     #     st.switch_page("pages/admin_portal.py")
-
-    # with Knowledge_Base_Explorer:
-    #     knowledge_base_explorer_page.render_knowledge_base_explorer()
-        # if st.button("Go to Knowledge Base Explorer"):
-        #     st.switch_page("pages/knowledge_base_explorer.py")
-
-# Render the Homepage
-# render_homepage()
+if __name__ == "__main__":
+    render_homepage()

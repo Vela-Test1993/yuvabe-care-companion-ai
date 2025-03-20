@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from utils import logger
+from backend.utils import logger
 
 logger = logger.get_logger()
 

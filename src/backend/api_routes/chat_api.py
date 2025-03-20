@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from services.embedding_service import get_text_embedding
-from services.pinecone_service import retrieve_context_from_pinecone
-from services.llm_model_service import get_health_advice
-from services.schemas import ConversationInput
-from utils import logger
+from backend.services.embedding_service import get_text_embedding
+from backend.services.pinecone_service import retrieve_context_from_pinecone
+from backend.services.llm_model_service import get_health_advice
+from backend.services.schemas import ConversationInput
+from backend.utils import logger
 
 logger = logger.get_logger()
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from services import pinecone_service, embedding_service
-from services.schemas import UpsertRequest, DeleteRequest, MetadataRequest
+from backend.services import pinecone_service, embedding_service
+from backend.services.schemas import UpsertRequest, DeleteRequest, MetadataRequest
 import pandas as pd
-from utils import logger
+from backend.utils import logger
 from fastapi.responses import JSONResponse
 
 logger = logger.get_logger()

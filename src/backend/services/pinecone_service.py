@@ -6,9 +6,9 @@ from pinecone import Pinecone, ServerlessSpec
 import time
 from tqdm import tqdm
 from dotenv import load_dotenv
-from utils import logger
+from backend.utils import logger
 import pandas as pd
-from services.embedding_service import get_text_embedding
+from backend.services.embedding_service import get_text_embedding
 from sentence_transformers import CrossEncoder
 
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')

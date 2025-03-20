@@ -1,8 +1,11 @@
 import json
 import os
+import sys
+src_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "backend"))
+sys.path.append(src_directory)
 from datetime import datetime
 from supabase import create_client, StorageException
-from utils import logger
+from backend.utils import logger
 from dotenv import load_dotenv
 
 # Logger Initialization
@@ -14,6 +17,7 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 SUPABASE_BUCKET = os.getenv('SUPABASE_BUCKET')
 LLM_MODEL_NAME = os.getenv('LLM_MODEL_NAME')
+BUCKET_FOLDER = "chat-history"
 
 # Supabase Client Initialization
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -138,3 +142,42 @@ def retrieve_chat_history(conversation_id: str) -> dict:
     except Exception as e:
         logger.error(f"Unexpected error retrieving chat history for ID {conversation_id}: {e}")
         return {"success": False, "error": "Unexpected error occurred while retrieving chat history."}
+    
+def get_bucket_items():
+    """
+    Retrieves item names from a specified Supabase storage bucket and returns them as a list, 
+    excluding the '.json' extension and omitting the last item in the response.
+
+    This function uses the globally defined `SUPABASE_BUCKET` and `BUCKET_FOLDER` variables 
+    to identify the bucket and folder path.
+
+    Returns:
+        list: A list of item names with '.json' removed, excluding the last item in the bucket.
+
+    Logs:
+        - An error if there are no items found in the bucket.
+        - An error if an exception occurs during the fetching process.
+
+    Example:
+        Suppose the bucket contains:
+        - "2025-03-18.json"
+        - "2025-03-19.json"
+        - "2025-03-20.json"
+
+        The function will return:
+        ['2025-03-18', '2025-03-19']
+
+    Raises:
+        Exception: Logs an error if fetching bucket items fails.
+    """
+    try:
+        response = supabase.storage.from_(SUPABASE_BUCKET).list(BUCKET_FOLDER)
+        conversation_ids = []
+        if response:
+            for item in response[:-1]:
+                conversation_ids.append(item['name'].replace('.json', ''))
+            return conversation_ids
+        else:
+            logger.error("No items found in the bucket.")
+    except Exception as e:
+        logger.error(f"Error fetching bucket items: {e}")

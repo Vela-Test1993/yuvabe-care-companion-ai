@@ -350,33 +350,19 @@ def display_message_box(role, content):
     border_color = "#1E88E5" if role.lower() == 'user' else "#43A047"
     text_align = "left" if role.lower() == 'user' else "right"
     flex_direction = "row" if role.lower() == 'user' else "row-reverse"
-    avatar = "path_to_user_avatar.png" if role.lower() == 'user' else "path_to_assistant_avatar.png"
 
     st.markdown(f"""
-        <div style="
-            display: flex; 
-            flex-direction: {flex_direction}; 
-            align-items: center; 
-            margin-bottom: 10px;
-            gap: 10px;">
-            
-            <img src="{avatar}" alt="{role} avatar" style="width: 40px; height: 40px; border-radius: 50%;">
-
-            <div style="
-                background-color: {background_color}; 
-                padding: 15px; 
-                border-left: 5px solid {border_color}; 
-                border-radius: 8px; 
-                box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-                width: 100%;">
-                
-                <strong style="color: #333; font-size: 16px;">{role}:</strong>
-                <div style="margin-top: 5px; color: #555; font-size: 14px;">
-                    {content}
+                <div style="
+                    background-color: {background_color}; 
+                    padding: 15px; 
+                    border-left: 5px solid #4CAF50; 
+                    border-radius: 8px; 
+                    margin-bottom: 10px;
+                    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);">
+                    <strong style="color: #333; font-size: 16px;">{role}:</strong>
+                    <div style="margin-top: 5px; color: #555; font-size: 14px;">{content}</div>
                 </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
 def get_chat_history_from_db(conversation_id: str, retries=3, delay=5):
     API_URL = "http://127.0.0.1:8000/chat-history/retrieve"

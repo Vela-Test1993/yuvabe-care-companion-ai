@@ -47,7 +47,6 @@ def render_chatbot():
         avatar_image = "src/frontend/images/chat_doctor_logo.png" if role == "assistant" else "src/frontend/images/healthy.png" if role == "user" else None
         with st.chat_message(role, avatar=avatar_image):
             common_functions.display_message_box(role,message['content'])
-            # st.write(message["content"])
 
     # User Input
     user_input = st.chat_input("Ask your health-related question:")

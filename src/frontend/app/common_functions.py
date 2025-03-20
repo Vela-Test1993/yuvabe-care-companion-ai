@@ -217,7 +217,7 @@ def custom_navbar():
                 <a href="/" class="nav-link">Home</a>
                 <a href="/Admin_Portal" class="nav-link">Admin Portal</a>
                 <a href="/Knowledge_Base_Explorer" class="nav-link">Knowledge Base Explorer</a>
-                <a href="/chatbot" class="nav-link">Chat With Us</a>
+                <a href="/Chat_With_Us" class="nav-link">Chat With Us</a>
             </div>
         </div>
         """,

@@ -76,7 +76,7 @@ def set_page_title(page_title=PAGE_TITLE, icon="⚕️", color="#2E7D32", font_s
             font-size: {font_size};
             font-weight: bold;
             margin-bottom: 15px;
-            text-align: center;
+            text-align: left;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Adds depth for a cleaner look */
             padding: 10px 0;  /* Improved spacing */
         ">

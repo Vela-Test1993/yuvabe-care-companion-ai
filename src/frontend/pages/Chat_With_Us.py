@@ -28,6 +28,11 @@ def fetch_health_advice(conversation_history):
         st.error(f"API Connection Error: {e}")
         return "I'm currently unable to respond. Please try again later."
     
+conversation_ids = common_functions.get_bucket_items()
+if conversation_ids:
+    for conversation_id in conversation_ids[-3:]:
+        common_functions.display_chat_history(conversation_id)
+
 def render_chatbot():
 
     if "conversation_history" not in st.session_state:
@@ -35,12 +40,7 @@ def render_chatbot():
 
     if 'conversation_id' not in st.session_state:
         st.session_state.conversation_id = datetime.now().strftime("%Y-%m-%d")
-
-    conversation_ids = common_functions.get_bucket_items()
-    if conversation_ids:
-        for conversation_id in conversation_ids[-3:]:
-            common_functions.display_chat_history(conversation_id)
-
+    
     # Display chat history
     for message in st.session_state.conversation_history [-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
         role = message["role"]
@@ -55,7 +55,7 @@ def render_chatbot():
                             "How can I help you today?")
         st.session_state.system_message = system_message
         with st.chat_message('ai'):
-            common_functions.typewriter_effect(st.session_state.system_message)
+            common_functions.typewriter_effect(st.session_state.system_message,speed=0)
 
     if user_input:
 
@@ -79,4 +79,5 @@ def render_chatbot():
         with st.chat_message('assistant',avatar=doctor_avatar_image):
             common_functions.typewriter_effect(assistant_reply)
 
-render_chatbot()
+if __name__ == "__main__":
+    render_chatbot()
